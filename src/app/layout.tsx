@@ -1,12 +1,14 @@
 import './globals.css'
+import '@mantine/core/styles.css';
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { MantineProvider, ColorSchemeScript } from '@mantine/core';
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Todo App',
-  description: 'Todo app',
+  title: 'Type Fighters',
+  description: 'Battle to see who is the ultimate typer',
 }
 
 export default function RootLayout({
@@ -16,7 +18,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <head>
+        <ColorSchemeScript />
+      </head>
+
+      <body className={inter.className}>
+        <MantineProvider>{children}</MantineProvider>
+      </body>
     </html>
   )
 }
