@@ -6,7 +6,6 @@ Web game I am developing where two players compete to see who is the faster typi
 
 (Work in progress)
 
-- **DB:** Prisma + Postgres
 - **Front-end + Back-end:** NextJS
 - **UI Kit:** [Mantine](https://mantine.dev/)
 
