@@ -1,5 +1,7 @@
 ## Type fighters
 
+(\***\*Work in progress\*\***)
+
 Web game I am developing where two players compete to see who is the faster typist!
 
 ### Tech Stack
@@ -7,7 +9,6 @@ Web game I am developing where two players compete to see who is the faster typi
 (Work in progress)
 
 - **Front-end + Back-end:** NextJS
-- **UI Kit:** [Mantine](https://mantine.dev/)
 
 ## Run Localy
 
