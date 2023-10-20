@@ -1,7 +1,13 @@
-import './globals.css'
+import '@/styles/globals.css';
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-const inter = Inter({ subsets: ['latin'] })
+import { Roboto_Mono } from 'next/font/google'
+
+const inter = Roboto_Mono({ subsets: ['latin'] })
+
+// const oxygen = Oxygen({
+//   weight: '400',
+//   subsets: ['latin'],
+// })
 
 export const metadata: Metadata = {
   title: 'Type Fighters',
@@ -17,7 +23,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
       </head>
-      <body className={inter.className}>
+      <body className={`${inter.className} dark`}>
         {children}
       </body>
     </html>
