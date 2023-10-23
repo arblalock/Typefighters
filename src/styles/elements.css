@@ -17,7 +17,7 @@
 
 .btn-primary{
     background-color: var(--dark-alt1);
-    border-color: var(--dark-alt2);
+    border-color: var(--dark-alt3);
 }
 
 .btn-primary:hover{
