@@ -1,0 +1,25 @@
+.btn{
+    border: 1px solid;
+    transition: all .2s ease-in-out;
+}
+
+.btn:hover{
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgb(18, 18, 18);
+    transform: scale(1.1);
+}
+
+.btn:active{
+    transform: translate(0px, 2px);
+    transform:scale(1);
+    box-shadow: 0;
+}
+
+.btn-primary{
+    background-color: var(--dark-alt1);
+    border-color: var(--dark-alt2);
+}
+
+.btn-primary:hover{
+    background-color: var(--dark-alt2);
+}

@@ -1,9 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import 'variables';
+@import 'colors';
 @import 'theme';
-
-.text-xl-vw{
-    font-size: clamp(1rem, 6vw, 6rem);
-}
+@import 'sizes';
+@import 'elements';
