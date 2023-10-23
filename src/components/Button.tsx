@@ -1,11 +1,10 @@
 'use client'
 import { EleSize } from '@/types/comp-types';
-import { getMarginSize, getPaddingSize, getTwFontSize, getWidthSize } from '@/utils/css-utils';
+import { getMarginSize, getPaddingSize, getTextSize, getTwFontSize, getWidthSize } from '@/utils/css-utils';
 import { useRouter } from 'next/navigation';
 
 interface ButtonProps {
     url: string;
-    btnSize: EleSize;
     textSize: EleSize;
     buttonStyle: ButtonStyle | string;
     text: string
@@ -13,7 +12,7 @@ interface ButtonProps {
 
 export type ButtonStyle = 'primary' | 'alt1'
 
-export const Button = ({ url, btnSize: size, textSize, buttonStyle, text }: ButtonProps) => {
+export const Button = ({ url, textSize, buttonStyle, text }: ButtonProps) => {
 
     const router = useRouter();
 
@@ -23,8 +22,12 @@ export const Button = ({ url, btnSize: size, textSize, buttonStyle, text }: Butt
 
     return (
         <div onClick={handleClick}
-            style={{ margin: getMarginSize(size), padding: `${getPaddingSize('lg')} ${getPaddingSize(size)}` }}
-            className={`btn btn-${buttonStyle} ${getTwFontSize(textSize)}`}>
+            style={{
+                fontSize: getTextSize(textSize),
+                margin: getMarginSize('xl'),
+                padding: `${getPaddingSize('lg')} ${getPaddingSize('xl')}`
+            }}
+            className={`btn btn-${buttonStyle}`}>
             <div>{text}</div>
         </div>
     )
