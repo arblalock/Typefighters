@@ -6,6 +6,7 @@
     }
   },
   "compilerOptions": {
+    "outDir": "./build",
     "target": "ESNext",
     "lib": [
       "dom",

@@ -1,12 +1,11 @@
 import { Server } from "socket.io";
 import { createServer } from "http";
-import {ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData} from "./types/io";
+import {ClientToServerEvents, ServerToClientEvents, SocketData} from "./types/io";
 
 const server = createServer();
 const io = new Server<
     ClientToServerEvents,
     ServerToClientEvents,
-    InterServerEvents,
     SocketData
 >(server, {'transports':['websocket']});
 
