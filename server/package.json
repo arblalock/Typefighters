@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node-dev src/index.ts"
+    "dev": "node-dev src/index.ts",
+    "build" : "tsc"
   },
   "dependencies": {
     "socket.io": "^4.7.2"
