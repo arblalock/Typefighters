@@ -1,0 +1,34 @@
+{
+  "ts-node": {
+    "compilerOptions": {
+      "module": "NodeNext",
+      "target": "ESNext"
+    }
+  },
+  "compilerOptions": {
+    "target": "ESNext",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "moduleResolution": "node",
+    "allowJs": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "paths": {
+      "@/*": [
+        "./src/*",
+        "./src/types/*",
+      ]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "src/types/types.mjs"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
