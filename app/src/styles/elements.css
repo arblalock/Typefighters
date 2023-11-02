@@ -34,3 +34,13 @@
 .btn-link:hover{
     cursor: pointer;
 }
+
+.dark-input {
+    border: 1px solid var(--dark-highlight-1);
+    border-radius: 1px;
+    background-color: var(--dark-2);
+  }
+
+ input:placeholder-shown, .input-sm-pl{
+    font-size: 1.5em;
+  }
