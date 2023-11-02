@@ -6,7 +6,7 @@
 .btn:hover{
     cursor: pointer;
     box-shadow: 0 2px 8px rgb(18, 18, 18);
-    transform: scale(1.1);
+    transform: scale(1.05);
 }
 
 .btn:active{
@@ -16,10 +16,21 @@
 }
 
 .btn-primary{
-    background-color: var(--dark-alt1);
-    border-color: var(--dark-alt3);
+    background-color: var(--dark-3);
+    border-color: var(--dark-4);
 }
 
 .btn-primary:hover{
-    background-color: var(--dark-alt2);
+    background-color: var(--dark-4);
+}
+
+.btn-disabled{
+    background-color: var(--disabled-primary);
+    color: var(--disabled-font-color);
+    pointer-events:none;
+    transition: none;
+}
+
+.btn-link:hover{
+    cursor: pointer;
 }

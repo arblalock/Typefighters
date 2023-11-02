@@ -1,23 +1,30 @@
 'use client'
 import { EleSize } from '@/types/comp-types';
-import { getMarginSize, getPaddingSize, getTextSize, getTwFontSize, getWidthSize } from '@/utils/css-utils';
+import { getMarginSize, getPaddingSize, getTextSize } from '@/utils/css-utils';
 import { useRouter } from 'next/navigation';
 
 interface ButtonProps {
-    url: string;
+    url?: string | null;
+    callback?: Function | null;
     textSize: EleSize;
     buttonStyle: ButtonStyle | string;
     text: string
 }
 
-export type ButtonStyle = 'primary' | 'alt1'
+export type ButtonStyle = 'primary' | 'alt1' | 'disabled'
 
-export const Button = ({ url, textSize, buttonStyle, text }: ButtonProps) => {
+export const Button = ({ url, textSize, buttonStyle, text, callback }: ButtonProps) => {
 
     const router = useRouter();
 
     const handleClick = () => {
-        router.push(url);
+        if (typeof url === 'string') {
+            router.push(url);
+            return;
+        }
+        if (typeof callback === 'function') {
+            callback();
+        }
     }
 
     return (

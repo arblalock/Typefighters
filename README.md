@@ -2,7 +2,7 @@
 
 (\***\*Work in progress\*\***)
 
-Web game I am developing where two players compete to see who is the faster typist!
+Web app I am developing where two players compete to see who is the faster typist!
 
 ### Tech Stack
 
@@ -17,7 +17,7 @@ Tech Stack consists of two main components:
 - A SocketIO server that handles the real-time events needed for the game
 
 A seperate SocketIO server is used to improve future scalability/performance by seperating real-time client
-websocket requests from the normal client-side requests handled by NextJS. In the future this allows each to be run/deployed on different processes/containers/servers/etc...
+websocket requests from the normal client-side requests handled by NextJS. This will allow each to be run on different containers/servers/etc...
 
 ## Run Localy
 

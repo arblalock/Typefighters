@@ -1,4 +1,8 @@
 .dark{
-    background-color: var(--dark-primary);
+    background-color: var(--dark-1);
     color: var(--font-color);
+}
+
+.dark-bg-2{
+    background-color: var(--dark-2);
 }
