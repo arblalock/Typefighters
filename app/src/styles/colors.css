@@ -1,10 +1,14 @@
 :root {
-    --font-color: rgb(245, 245, 245);
-    --dark-1: #1a1b1e;
-    --dark-2: #141517;
-    --dark-3: #282a2e;
-    --dark-4: #52555f;
-    --dark-highlight-1: rgb(145, 145, 145);
-    --disabled-primary: #1b1c1f;
-    --disabled-font-color:rgb(78, 78, 78);
-  }
+  --font-color: rgb(245, 245, 245);
+  --dark-1: #1a1b1e;
+  --dark-2: #141517;
+  --dark-3: #282a2e;
+  --dark-4: #52555f;
+  --dark-5: #292b35;
+  --dark-6: #353845;
+  --blue-1: #6a80e6;
+  --blue-2: #586dc9;
+  --dark-highlight-1: #3e404f;
+  --disabled-primary: #1b1c1f;
+  --disabled-font-color: rgb(78, 78, 78);
+}
