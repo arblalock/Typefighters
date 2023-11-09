@@ -4,9 +4,9 @@ import {ClientToServerEvents, ServerToClientEvents} from "../../common/io";
 import { createClient } from 'redis';
 import { GameRoom, PlayerData } from "../../common/game";
 
-const rClient = await createClient()
-  .on('error', err => console.log('Redis Client Error', err))
-  .connect();
+// const rClient = await createClient()
+//   .on('error', err => console.log('Redis Client Error', err))
+//   .connect();
 
 const server = createServer();
 const io = new Server<

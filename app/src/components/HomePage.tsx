@@ -8,7 +8,7 @@ export const HomePage = () => {
                 <div className="text-xl-vw">TypeFighters</div>
             </div>
             <div className="m-6">
-                <Button text="Play with friend" url="/FriendCode" textSize="4xl" buttonStyle="primary" />
+                <Button text="Play with friend" url="/FriendRoom" textSize="4xl" buttonStyle="primary" />
                 <Button text="Matchmaking (Coming Soon)" url="/MatchRoom" textSize="2xl" buttonStyle="disabled" />
             </div>
         </CenterContainer>
