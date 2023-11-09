@@ -10,7 +10,7 @@ export default function Page() {
                 Give your friend this link:
             </div>
             <div className="m-2">
-                <ShareableLink text="testingalink.com" />
+                <ShareableLink linkTxt="testingalink.com" />
             </div>
         </CenterContainer>
     )

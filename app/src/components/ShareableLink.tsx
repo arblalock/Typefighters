@@ -5,9 +5,8 @@ import { getTextSize } from "@/utils/css-utils";
 import { useState, useRef } from "react"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCopy } from '@fortawesome/free-solid-svg-icons'
-import { link } from "fs/promises";
 
-export const ShareableLink = ({ text: linkTxt, cb, textSize = 'xl' }: { text: string, cb?: Function, textSize?: EleSize }) => {
+export const ShareableLink = ({ linkTxt, cb, textSize = 'xl' }: { linkTxt: string, cb?: Function, textSize?: EleSize }) => {
 
     const [mouseIsHovering, setMouseIsHovering] = useState<boolean>(false);
     const [linkHoverClass, setLinkHoverClass] = useState<string>('')
@@ -36,6 +35,7 @@ export const ShareableLink = ({ text: linkTxt, cb, textSize = 'xl' }: { text: st
     }
 
     const handleLinkCopyClick = (isIconClick: Boolean) => {
+        navigator.clipboard.writeText(descTxt)
         if (cb) {
             cb();
         }

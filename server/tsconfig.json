@@ -20,14 +20,14 @@
     "paths": {
       "@/*": [
         "./src/*",
-        "./src/types/*",
+        "../common/*",
       ]
     }
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
-    "src/types/types.mjs"
+    "../common/types.mjs"
   ],
   "exclude": [
     "node_modules"
