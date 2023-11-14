@@ -1,5 +1,6 @@
 import { Server, Socket } from "socket.io";
 import { createServer } from "http";
+import short from "short-uuid";
 import {ClientToServerEvents, ServerToClientEvents} from "../../common/io";
 import { createClient } from 'redis';
 import { GameRoom, PlayerData } from "../../common/game";
@@ -17,11 +18,26 @@ const io = new Server<
 
 io.on('connection', (socket) => {
     console.log('a user connected');
+    socket.on("requestUserSession", (playerData) => handleUserSessionReq(socket, playerData))
     socket.on("requestNewGameRoom", (playerData) => handleNewGameRoomReq(socket, playerData))
     socket.on("requestJoinGameRoom", (playerData) => handleJoinRoomReq(socket, playerData))
 });
 
+const handleUserSessionReq = (socket: Socket, playerData: PlayerData) =>{
+    playerData.socketId = socket.id;
+    //If player id is null create a unique id
+    if(playerData.playerId == null){
+        const uuid = `${short.generate()}-${Date.now()}`;
+        playerData.playerId = uuid;
+    }
+    console.log("User session created");
+    socket.emit("userSessionCreatedEvent", playerData);
+}
+
 const handleNewGameRoomReq = (socket: Socket, playerData: PlayerData) =>{
+    //Serialization notes:
+    //https://stackoverflow.com/questions/16261119/typescript-objects-serialization/71623375#71623375
+
     let newGameRoom = new GameRoom("awdawd")
     socket.emit("gameRoomCreatedEvent", newGameRoom);
 }

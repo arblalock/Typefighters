@@ -1,5 +1,3 @@
-//Serialization notes:
-//https://stackoverflow.com/questions/16261119/typescript-objects-serialization/71623375#71623375
 export class GameRoom {
     roomCode: string;
     createdDate: string;
@@ -43,7 +41,7 @@ export class PlayerData {
     currentRoom: string;
     currentScore: Number;
 
-    constructor(socketId: string, playerId: string, currentRoom: string){
+    constructor(socketId: string, playerId?: string, currentRoom?: string){
         this.socketId = socketId;
         this.playerId = playerId;
         this.currentRoom = currentRoom;
