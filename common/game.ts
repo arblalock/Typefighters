@@ -10,11 +10,11 @@ export class GameRoom {
         this.currentRound = 0;
     }
 
-    addPlayer(socketId: string, playerId: string){
+    addPlayer(playerData: PlayerData){
         if(this.playerData.length >=2){
             console.error("Error: Too many players in room, remove one.")
         }
-        this.playerData.push(new PlayerData(socketId, playerId, this.roomCode));
+        this.playerData.push(playerData);
     }
 
     updatePlayerScore(playerId: string, newScore: Number){
@@ -32,7 +32,15 @@ export class GameRoom {
 
     getPlayerIDs(): Array<string> {
         return this.playerData.map(ele => ele.playerId);
-    }   
+    }  
+
+    // getGameRoomJSON = ():string =>{
+
+    // }
+    
+    static GameRoomFromJSON = (gameroom: string): GameRoom =>{
+        return new GameRoom("awdwd");
+    }
 }
 
 export class PlayerData {
@@ -40,11 +48,13 @@ export class PlayerData {
     playerId: string;
     currentRoom: string;
     currentScore: Number;
+    gameRooms: string[];
 
-    constructor(socketId: string, playerId?: string, currentRoom?: string){
+    constructor(socketId: string, playerId?: string, currentRoom?: string, gamerooms = []){
         this.socketId = socketId;
         this.playerId = playerId;
         this.currentRoom = currentRoom;
         this.currentScore = 0;
+        this.gameRooms = gamerooms;
     }
 }

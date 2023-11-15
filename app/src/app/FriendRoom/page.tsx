@@ -31,12 +31,12 @@ export default function Page() {
         if (pid) {
             playerData.playerId = pid;
         }
-        client.socket.emit("requestUserSession", playerData)
+        client?.socket.emit("requestUserSession", playerData)
     }
 
     const handleUserSessionCreated = (playerData: PlayerData) => {
-        console.log(playerData.playerId);
         LocalStorageSetPlayerID(playerData.playerId);
+        client?.socket.emit("requestNewGameRoom", playerData);
     }
 
     return (

@@ -2,12 +2,11 @@ import { Server, Socket } from "socket.io";
 import { createServer } from "http";
 import short from "short-uuid";
 import {ClientToServerEvents, ServerToClientEvents} from "../../common/io";
-import { createClient } from 'redis';
 import { GameRoom, PlayerData } from "../../common/game";
+import { GenRoomCode } from "./utils/utilities";
+import { RedisClient } from "./db/redis";
 
-// const rClient = await createClient()
-//   .on('error', err => console.log('Redis Client Error', err))
-//   .connect();
+const redis = await RedisClient.CreateNewClient();
 
 const server = createServer();
 const io = new Server<
@@ -34,12 +33,27 @@ const handleUserSessionReq = (socket: Socket, playerData: PlayerData) =>{
     socket.emit("userSessionCreatedEvent", playerData);
 }
 
-const handleNewGameRoomReq = (socket: Socket, playerData: PlayerData) =>{
+const handleNewGameRoomReq = async(socket: Socket, playerData: PlayerData) =>{
     //Serialization notes:
     //https://stackoverflow.com/questions/16261119/typescript-objects-serialization/71623375#71623375
+    let roomCode = await GetUnqiueRoomCode();
+    let newGameRoom = new GameRoom(roomCode);
+    newGameRoom.addPlayer(playerData);
+    //Add room to Redis
 
-    let newGameRoom = new GameRoom("awdawd")
+    //Create room in socket.io
+
+
     socket.emit("gameRoomCreatedEvent", newGameRoom);
+}
+
+const GetUnqiueRoomCode = async() : Promise<string> =>{
+    while(true){
+        let roomCode = GenRoomCode();
+        //Check if this roomcode is being used
+        const roomExists = await redis.checkRoomExists(roomCode);
+        if (roomExists === false) return roomCode;
+    }
 }
 
 
