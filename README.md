@@ -21,10 +21,7 @@ websocket requests from the normal client-side requests handled by NextJS. This 
 
 ## Run Localy
 
-First set your evironment variables:
-
-- SOCKETIO_PORT="8080"
-- NEXT_PUBLIC_SOCKETIO_PORT=$SOCKETIO_PORT
+First, in your development environment set any needed evironment variables to ones you'd like to use. For example the socketIO port vars (SOCKETIO_PORT, NEXT_PUBLIC_SOCKETIO_PORT) can be set to 8080.
 
 Run Web App:
 
