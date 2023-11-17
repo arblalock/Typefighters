@@ -34,9 +34,9 @@ export class GameRoom {
         return this.playerData.map(ele => ele.playerId);
     }  
 
-    // getGameRoomJSON = ():string =>{
-
-    // }
+    getGameRoomJSON = ():string =>{
+        return JSON.stringify(this);
+    }
     
     static GameRoomFromJSON = (gameroom: string): GameRoom =>{
         return new GameRoom("awdwd");

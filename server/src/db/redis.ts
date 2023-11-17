@@ -1,4 +1,4 @@
-import { GameRoom } from '@/game';
+import { GameRoom } from '../../../common/game';
 import { createClient } from 'redis';
 type RedisClientConnection = ReturnType<typeof createClient>
 

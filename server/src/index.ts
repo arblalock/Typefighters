@@ -6,7 +6,9 @@ import { GameRoom, PlayerData } from "../../common/game";
 import { GenRoomCode } from "./utils/utilities";
 import { RedisClient } from "./db/redis";
 
-const redis = await RedisClient.CreateNewClient();
+let redis:RedisClient;
+
+
 
 const server = createServer();
 const io = new Server<
@@ -15,7 +17,10 @@ const io = new Server<
 >(server, {'transports':['websocket']});
 
 
-io.on('connection', (socket) => {
+io.on('connection', async(socket) => {
+    if(redis == null){
+        redis = await RedisClient.CreateNewClient();
+    }
     console.log('a user connected');
     socket.on("requestUserSession", (playerData) => handleUserSessionReq(socket, playerData))
     socket.on("requestNewGameRoom", (playerData) => handleNewGameRoomReq(socket, playerData))
@@ -34,13 +39,12 @@ const handleUserSessionReq = (socket: Socket, playerData: PlayerData) =>{
 }
 
 const handleNewGameRoomReq = async(socket: Socket, playerData: PlayerData) =>{
-    //Serialization notes:
-    //https://stackoverflow.com/questions/16261119/typescript-objects-serialization/71623375#71623375
     let roomCode = await GetUnqiueRoomCode();
     let newGameRoom = new GameRoom(roomCode);
     newGameRoom.addPlayer(playerData);
     //Add room to Redis
-
+    //TODO: add method to gameroom that turns it into JSON
+    console.log(newGameRoom.getGameRoomJSON());
     //Create room in socket.io
 
 
@@ -64,7 +68,10 @@ const handleJoinRoomReq = (socket: Socket, playerData: PlayerData) =>{
     // socket.emit("gameRoomJoinedEvent", newGameRoom);
 }
 
-server.listen(process.env.SOCKETIO_PORT, () => {
+server.listen(process.env.SOCKETIO_PORT, async() => {
+    if(redis == null){
+        redis = await RedisClient.CreateNewClient();
+    }
     console.log(`SocketIO server running on http://localhost:${process.env.SOCKETIO_PORT}`)
 });
 
