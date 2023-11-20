@@ -2,7 +2,7 @@ import { Server, Socket } from "socket.io";
 import { createServer } from "http";
 import short from "short-uuid";
 import {ClientToServerEvents, ServerToClientEvents} from "../../common/io";
-import { GameRoom, PlayerData } from "../../common/game";
+import { GameRoom, IGameRoom, PlayerData, IPlayerData } from "../../common/game";
 import { GenRoomCode } from "./utils/utilities";
 import { RedisClient } from "./db/redis";
 
@@ -27,7 +27,8 @@ io.on('connection', async(socket) => {
     socket.on("requestJoinGameRoom", (playerData) => handleJoinRoomReq(socket, playerData))
 });
 
-const handleUserSessionReq = (socket: Socket, playerData: PlayerData) =>{
+const handleUserSessionReq = (socket: Socket, pd: IPlayerData) =>{
+    let playerData = PlayerData.PlayerDataFromObj(pd);
     playerData.socketId = socket.id;
     //If player id is null create a unique id
     if(playerData.playerId == null){
@@ -44,7 +45,10 @@ const handleNewGameRoomReq = async(socket: Socket, playerData: PlayerData) =>{
     newGameRoom.addPlayer(playerData);
     //Add room to Redis
     //TODO: add method to gameroom that turns it into JSON
-    console.log(newGameRoom.getGameRoomJSON());
+    let j = newGameRoom.getGameRoomJSON()
+
+    let g = GameRoom.GameRoomFromJSON(j);
+    console.log(g);
     //Create room in socket.io
 
 

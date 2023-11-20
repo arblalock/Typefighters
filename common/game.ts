@@ -1,20 +1,45 @@
-export class GameRoom {
+export interface IGameRoom{
     roomCode: string;
     createdDate: string;
     playerData: Array<PlayerData>;
     currentRound: Number;
+}
+
+export interface IPlayerData{
+    socketId: string;
+    playerId: string;
+    currentRoom: string;
+    createdDate: string;
+    currentScore: Number;
+    gameRooms: string[];
+}
+export interface GameRoom extends IGameRoom { }
+export interface PlayerData extends IPlayerData { }
+
+export class GameRoom {
 
     constructor(roomCode: string) {
         this.roomCode = roomCode;
         this.createdDate = new Date().toISOString();
         this.currentRound = 0;
+        this.playerData = []
     }
 
-    addPlayer(playerData: PlayerData){
+    static GameRoomFromObj = (data: Object) : GameRoom =>{
+        let result = new GameRoom(null);
+        return Object.assign(result, data, {})
+    }
+
+    static GameRoomFromJSON = (data: string) : GameRoom =>{
+        let result = new GameRoom(null);
+        return Object.assign(result, JSON.parse(data), {})
+    }
+
+    addPlayer(pd: PlayerData){
         if(this.playerData.length >=2){
             console.error("Error: Too many players in room, remove one.")
         }
-        this.playerData.push(playerData);
+        this.playerData.push(pd);
     }
 
     updatePlayerScore(playerId: string, newScore: Number){
@@ -26,7 +51,7 @@ export class GameRoom {
         }
     }
 
-    getPlayer(Id: string){
+    getPlayer(Id: string):PlayerData{
         return this.playerData.find(x => x.playerId === Id)
     }
 
@@ -37,18 +62,9 @@ export class GameRoom {
     getGameRoomJSON = ():string =>{
         return JSON.stringify(this);
     }
-    
-    static GameRoomFromJSON = (gameroom: string): GameRoom =>{
-        return new GameRoom("awdwd");
-    }
 }
 
 export class PlayerData {
-    socketId: string;
-    playerId: string;
-    currentRoom: string;
-    currentScore: Number;
-    gameRooms: string[];
 
     constructor(socketId: string, playerId?: string, currentRoom?: string, gamerooms = []){
         this.socketId = socketId;
@@ -56,5 +72,19 @@ export class PlayerData {
         this.currentRoom = currentRoom;
         this.currentScore = 0;
         this.gameRooms = gamerooms;
+        this.createdDate = new Date().toISOString();
+    }
+
+    static PlayerDataFromObj = (data: Object) :PlayerData =>{
+        let result = new PlayerData(null);
+        return Object.assign(result, data, {})
+    }
+
+    static PlayerDataFromJSON = (data: string) =>{
+        let result = new PlayerData(null);
+        return Object.assign(result, JSON.parse(data), {})
+    }
+    getPlayerJSON = ():string =>{
+        return JSON.stringify(this);
     }
 }

@@ -13,7 +13,7 @@ export class RedisClient {
     getRoom = async(roomCode) : Promise<GameRoom> | null =>{
         let roomJSON = await this.client.get(roomCode)
         if(!roomJSON) return null;
-        return GameRoom.GameRoomFromJSON(roomJSON)
+        // return GameRoom.GameRoomFromJSON(roomJSON)
     }
 
     checkRoomExists = async(roomCode: string):Promise<boolean> =>{

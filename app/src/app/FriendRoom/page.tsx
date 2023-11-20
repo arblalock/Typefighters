@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react'
 import { CenterContainer } from "@/components/CenterContainer";
 import { ShareableLink } from '@/components/ShareableLink';
 import { SocketClient } from '@/lib/socket';
-import { PlayerData } from '@/common/game';
-import { LocalStorageGetPlayerID, LocalStorageSetPlayerID } from '@/utils/localStorage';
+import { PlayerData, IPlayerData } from '@/common/game';
+import { LocalStorageGetPlayerData, LocalStorageStorePlayerData } from '@/utils/localStorage';
 
 export default function Page() {
     const [client, setClient] = useState<SocketClient>();
@@ -26,16 +26,18 @@ export default function Page() {
 
     const handleSockConnect = () => {
         if (!client) return;
-        const pid = LocalStorageGetPlayerID();
-        const playerData = new PlayerData(client.socket.id);
-        if (pid) {
-            playerData.playerId = pid;
+        let playerData = LocalStorageGetPlayerData();
+        if (playerData == null) {
+            playerData = new PlayerData(client.socket.id);
+        } else {
+            playerData.socketId = client.socket.id;
         }
         client?.socket.emit("requestUserSession", playerData)
     }
 
-    const handleUserSessionCreated = (playerData: PlayerData) => {
-        LocalStorageSetPlayerID(playerData.playerId);
+    const handleUserSessionCreated = (pd: IPlayerData) => {
+        let playerData = PlayerData.PlayerDataFromObj(pd);
+        LocalStorageStorePlayerData(playerData);
         client?.socket.emit("requestNewGameRoom", playerData);
     }
 
