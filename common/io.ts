@@ -4,6 +4,7 @@ export interface ServerToClientEvents {
     gameRoomCreatedEvent: (gr: IGameRoom) => void;
     gameRoomJoinedEvent: (gr: IGameRoom) => void;
     userSessionCreatedEvent: (pdu: IPlayerData) => void;
+    userLeftGameRoom: (gr: IGameRoom) => void;
 }
 
 export interface ClientToServerEvents {

@@ -5,16 +5,7 @@ export interface IGameRoom{
     currentRound: Number;
 }
 
-export interface IPlayerData{
-    socketId: string;
-    playerId: string;
-    currentRoom: string;
-    createdDate: string;
-    currentScore: Number;
-    gameRooms: string[];
-}
 export interface GameRoom extends IGameRoom { }
-export interface PlayerData extends IPlayerData { }
 
 export class GameRoom {
 
@@ -25,21 +16,27 @@ export class GameRoom {
         this.playerData = []
     }
 
-    static GameRoomFromObj = (data: Object) : GameRoom =>{
-        let result = new GameRoom(null);
+    static GameRoomFromJSON = (data: any) :GameRoom =>{
+        if(typeof data === "string"){
+            data = JSON.parse(data);
+        }
+        let result = new GameRoom("");
         return Object.assign(result, data, {})
     }
 
-    static GameRoomFromJSON = (data: string) : GameRoom =>{
-        let result = new GameRoom(null);
-        return Object.assign(result, JSON.parse(data), {})
-    }
-
     addPlayer(pd: PlayerData){
-        if(this.playerData.length >=2){
+        if(this.getNumPlayers() >=2){
             console.error("Error: Too many players in room, remove one.")
         }
         this.playerData.push(pd);
+    }
+
+    removePlayerByPID(playerID: string){
+        this.playerData = this.playerData.filter(x=>x.playerId !== playerID);
+    }
+
+    removePlayerBySocketID(socketID: string){
+        this.playerData = this.playerData.filter(x=>x.socketId !== socketID);
     }
 
     updatePlayerScore(playerId: string, newScore: Number){
@@ -51,39 +48,59 @@ export class GameRoom {
         }
     }
 
-    getPlayer(Id: string):PlayerData{
+    getPlayer(Id: string):PlayerData | undefined{
         return this.playerData.find(x => x.playerId === Id)
     }
 
-    getPlayerIDs(): Array<string> {
+    getPlayerIDs(): (string | undefined) [] {
         return this.playerData.map(ele => ele.playerId);
     }  
+
+    getNumPlayers():number{
+        return this.playerData.length;
+    }
 
     getGameRoomJSON = ():string =>{
         return JSON.stringify(this);
     }
 }
 
+export interface IPlayerData{
+    socketId: string;
+    playerId: string | undefined;
+    currentRoom: string | undefined;
+    createdDate: string;
+    currentScore: Number;
+}
+
+export interface PlayerData extends IPlayerData { }
+
 export class PlayerData {
 
-    constructor(socketId: string, playerId?: string, currentRoom?: string, gamerooms = []){
+    constructor(socketId: string, playerId?: string, currentRoom?: string){
         this.socketId = socketId;
         this.playerId = playerId;
         this.currentRoom = currentRoom;
         this.currentScore = 0;
-        this.gameRooms = gamerooms;
         this.createdDate = new Date().toISOString();
     }
 
-    static PlayerDataFromObj = (data: Object) :PlayerData =>{
-        let result = new PlayerData(null);
+    joinRoom(roomCode: string){
+        this.currentRoom = roomCode;
+    }
+
+    leaveRoom(){
+        this.currentRoom = null;
+    }
+
+    static PlayerDataFromJSON = (data: any) :PlayerData =>{
+        if(typeof data === "string"){
+            data = JSON.parse(data);
+        }
+        let result = new PlayerData("");
         return Object.assign(result, data, {})
     }
 
-    static PlayerDataFromJSON = (data: string) =>{
-        let result = new PlayerData(null);
-        return Object.assign(result, JSON.parse(data), {})
-    }
     getPlayerJSON = ():string =>{
         return JSON.stringify(this);
     }

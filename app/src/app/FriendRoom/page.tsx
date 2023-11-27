@@ -36,7 +36,7 @@ export default function Page() {
     }
 
     const handleUserSessionCreated = (pd: IPlayerData) => {
-        let playerData = PlayerData.PlayerDataFromObj(pd);
+        let playerData = PlayerData.PlayerDataFromJSON(pd);
         LocalStorageStorePlayerData(playerData);
         client?.socket.emit("requestNewGameRoom", playerData);
     }

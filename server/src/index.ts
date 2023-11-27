@@ -2,13 +2,11 @@ import { Server, Socket } from "socket.io";
 import { createServer } from "http";
 import short from "short-uuid";
 import {ClientToServerEvents, ServerToClientEvents} from "../../common/io";
-import { GameRoom, IGameRoom, PlayerData, IPlayerData } from "../../common/game";
+import { GameRoom, PlayerData, IPlayerData } from "../../common/game";
 import { GenRoomCode } from "./utils/utilities";
 import { RedisClient } from "./db/redis";
 
 let redis:RedisClient;
-
-
 
 const server = createServer();
 const io = new Server<
@@ -25,10 +23,27 @@ io.on('connection', async(socket) => {
     socket.on("requestUserSession", (playerData) => handleUserSessionReq(socket, playerData))
     socket.on("requestNewGameRoom", (playerData) => handleNewGameRoomReq(socket, playerData))
     socket.on("requestJoinGameRoom", (playerData) => handleJoinRoomReq(socket, playerData))
+    socket.on("disconnect", () => handleUserDisconnect(socket));
 });
 
+const handleUserDisconnect = async(socket: Socket)=>{
+    for (const room of socket.rooms) {
+        if (room !== socket.id) {
+            let gameRoom = await redis.getRoom(room);
+            gameRoom.removePlayerBySocketID(socket.id);
+            redis.addUpdateRoom(gameRoom);
+            if(gameRoom.getNumPlayers() < 1){
+                redis.removeRoom(gameRoom.roomCode);
+                console.log("No players left, removing room...", room);
+            }
+            console.log("User left room", room);
+            socket.to(room).emit("userLeftGameRoom", gameRoom);
+        }
+      }
+}
+
 const handleUserSessionReq = (socket: Socket, pd: IPlayerData) =>{
-    let playerData = PlayerData.PlayerDataFromObj(pd);
+    let playerData = PlayerData.PlayerDataFromJSON(pd);
     playerData.socketId = socket.id;
     //If player id is null create a unique id
     if(playerData.playerId == null){
@@ -39,19 +54,17 @@ const handleUserSessionReq = (socket: Socket, pd: IPlayerData) =>{
     socket.emit("userSessionCreatedEvent", playerData);
 }
 
-const handleNewGameRoomReq = async(socket: Socket, playerData: PlayerData) =>{
+const handleNewGameRoomReq = async(socket: Socket, playerData: IPlayerData) =>{
     let roomCode = await GetUnqiueRoomCode();
     let newGameRoom = new GameRoom(roomCode);
-    newGameRoom.addPlayer(playerData);
+    let player = PlayerData.PlayerDataFromJSON(playerData);
+    player.joinRoom(roomCode);
+    newGameRoom.addPlayer(player);
+    
     //Add room to Redis
-    //TODO: add method to gameroom that turns it into JSON
-    let j = newGameRoom.getGameRoomJSON()
-
-    let g = GameRoom.GameRoomFromJSON(j);
-    console.log(g);
-    //Create room in socket.io
-
-
+    await redis.addUpdateRoom(newGameRoom);
+    //Join room in socket.io
+    socket.join(roomCode);
     socket.emit("gameRoomCreatedEvent", newGameRoom);
 }
 
@@ -65,7 +78,7 @@ const GetUnqiueRoomCode = async() : Promise<string> =>{
 }
 
 
-const handleJoinRoomReq = (socket: Socket, playerData: PlayerData) =>{
+const handleJoinRoomReq = (socket: Socket, playerData: IPlayerData) =>{
     //TODO: make sure to broadcast to the room that the game can start with all players
     //joined
 
@@ -73,9 +86,6 @@ const handleJoinRoomReq = (socket: Socket, playerData: PlayerData) =>{
 }
 
 server.listen(process.env.SOCKETIO_PORT, async() => {
-    if(redis == null){
-        redis = await RedisClient.CreateNewClient();
-    }
     console.log(`SocketIO server running on http://localhost:${process.env.SOCKETIO_PORT}`)
 });
 

@@ -10,10 +10,21 @@ export class RedisClient {
         this.client = client;
     }
 
-    getRoom = async(roomCode) : Promise<GameRoom> | null =>{
+    getRoom = async(roomCode:string) : Promise<GameRoom> | null =>{
         let roomJSON = await this.client.get(roomCode)
         if(!roomJSON) return null;
-        // return GameRoom.GameRoomFromJSON(roomJSON)
+        return GameRoom.GameRoomFromJSON(roomJSON)
+    }
+
+    addUpdateRoom = async(gameRoom:GameRoom) : Promise<null> =>{
+        await this.client.set(gameRoom.roomCode, gameRoom.getGameRoomJSON());
+        return null;
+    }
+
+    removeRoom = async(roomCode: string)  : Promise<null> =>{
+        if(await this.checkRoomExists(roomCode) == false) return null;
+        await this.client.del(roomCode);
+        return null;
     }
 
     checkRoomExists = async(roomCode: string):Promise<boolean> =>{
