@@ -1,0 +1,33 @@
+.loader {
+    position: relative;
+    width: 125px;
+    height: 125px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loader:before,
+.loader:after {
+    content: '';
+    border-radius: 50%;
+    position: absolute;
+    inset: 0;
+    box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.3) inset;
+}
+
+.loader:after {
+    border: 2px solid #0d061b;
+    box-shadow: 0 3px 1px #812ed4 inset;
+    animation: rotate 1s cubic-bezier(0.8, 0.7, .6, 0.7) infinite;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0)
+    }
+
+    100% {
+        transform: rotate(360deg)
+    }
+}

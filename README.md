@@ -7,7 +7,7 @@ Web app I am developing where two players compete to see who is the faster typis
 ### Tech Stack
 
 - **Client/Server Web App:** NextJS
-- **Game Server:** SocketIO
+- **Game Server:** Node/SocketIO
 - **Database:** Redis
 
 Tech Stack consists of three main components:
@@ -21,7 +21,7 @@ websocket requests from the normal client-side requests handled by NextJS. This 
 
 ## Run Localy
 
-First, in your development environment set any needed evironment variables to ones you'd like to use. For example the socketIO port vars (SOCKETIO_PORT, NEXT_PUBLIC_SOCKETIO_PORT) can be set to 8080.
+First, in your development environment set any needed environment variables to ones you'd like to use. For example the socketIO port vars (SOCKETIO_PORT, NEXT_PUBLIC_SOCKETIO_PORT) can be set to 8080.
 
 Run Web App:
 
