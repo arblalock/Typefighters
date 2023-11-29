@@ -1,13 +1,13 @@
-export interface IGameRoom{
+export interface IMatchRoom{
     roomCode: string;
     createdDate: string;
     playerData: Array<PlayerData>;
     currentRound: Number;
 }
 
-export interface GameRoom extends IGameRoom { }
+export interface MatchRoom extends IMatchRoom { }
 
-export class GameRoom {
+export class MatchRoom {
 
     constructor(roomCode: string) {
         this.roomCode = roomCode;
@@ -16,11 +16,11 @@ export class GameRoom {
         this.playerData = []
     }
 
-    static GameRoomFromJSON = (data: any) :GameRoom =>{
+    static matchRoomFromJSON = (data: any) :MatchRoom =>{
         if(typeof data === "string"){
             data = JSON.parse(data);
         }
-        let result = new GameRoom("");
+        let result = new MatchRoom("");
         return Object.assign(result, data, {})
     }
 
@@ -60,7 +60,7 @@ export class GameRoom {
         return this.playerData.length;
     }
 
-    getGameRoomJSON = ():string =>{
+    getmatchRoomJSON = ():string =>{
         return JSON.stringify(this);
     }
 }

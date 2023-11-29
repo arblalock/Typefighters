@@ -3,13 +3,13 @@ import { useEffect, useState } from 'react'
 import { CenterContainer } from "@/components/CenterContainer";
 import { ShareableLink } from '@/components/ShareableLink';
 import { SocketClient } from '@/lib/socket';
-import { PlayerData, IPlayerData, IGameRoom, GameRoom } from '@/common/game';
+import { PlayerData, IPlayerData, IMatchRoom, MatchRoom } from '@/common/game';
 import { LocalStorageGetPlayerData, LocalStorageStorePlayerData } from '@/utils/localStorage';
 import { Loader } from '@/components/Loader';
 
 export default function Page() {
     const [client, setClient] = useState<SocketClient>();
-    const [gameRoom, setGameRoom] = useState<GameRoom>();
+    const [matchRoom, setMatchRoom] = useState<MatchRoom>();
     const [statusTxt, setStatusTxt] = useState<string>("Loading");
 
     useEffect(() => {
@@ -20,11 +20,11 @@ export default function Page() {
         if (client) {
             client.socket.on('connect', handleSockConnect);
             client.socket.on('userSessionCreatedEvent', handleUserSessionCreated);
-            client.socket.on('gameRoomCreatedEvent', handleGameRoomCreated);
+            client.socket.on('matchRoomCreatedEvent', handlematchRoomCreated);
             return () => {
                 client.socket.off('connect', handleSockConnect);
                 client.socket.off('userSessionCreatedEvent', handleUserSessionCreated);
-                client.socket.off('gameRoomCreatedEvent', handleGameRoomCreated);
+                client.socket.off('matchRoomCreatedEvent', handlematchRoomCreated);
             };
         }
     }, [client]);
@@ -43,23 +43,23 @@ export default function Page() {
     const handleUserSessionCreated = (pd: IPlayerData) => {
         let playerData = PlayerData.PlayerDataFromJSON(pd);
         LocalStorageStorePlayerData(playerData);
-        client?.socket.emit("requestNewGameRoom", playerData);
+        client?.socket.emit("requestNewmatchRoom", playerData);
     }
 
-    const handleGameRoomCreated = (gr: IGameRoom) => {
-        //TODO: set gameRoom, change status text to waiting for friend to join
+    const handlematchRoomCreated = (gr: IMatchRoom) => {
+        //TODO: set matchRoom, change status text to waiting for friend to join
     }
 
     const matchRoomUrl = (): string => {
-        if (gameRoom) {
-            return `${window.location}/MatchRoom/${gameRoom.roomCode}`
+        if (matchRoom) {
+            return `${window.location}/MatchRoom/${matchRoom.roomCode}`
         }
         return ""
     }
 
     return (
         <CenterContainer>
-            {gameRoom &&
+            {matchRoom &&
                 <div>
                     <div className="m-2 text-4xl">
                         Give your friend this link:

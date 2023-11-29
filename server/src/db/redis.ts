@@ -1,4 +1,4 @@
-import { GameRoom } from '../../../common/game';
+import { MatchRoom } from '../../../common/game';
 import { createClient } from 'redis';
 type RedisClientConnection = ReturnType<typeof createClient>
 
@@ -10,14 +10,14 @@ export class RedisClient {
         this.client = client;
     }
 
-    getRoom = async(roomCode:string) : Promise<GameRoom> | null =>{
+    getRoom = async(roomCode:string) : Promise<MatchRoom> | null =>{
         let roomJSON = await this.client.get(roomCode)
         if(!roomJSON) return null;
-        return GameRoom.GameRoomFromJSON(roomJSON)
+        return MatchRoom.matchRoomFromJSON(roomJSON)
     }
 
-    addUpdateRoom = async(gameRoom:GameRoom) : Promise<null> =>{
-        await this.client.set(gameRoom.roomCode, gameRoom.getGameRoomJSON());
+    addUpdateRoom = async(matchRoom:MatchRoom) : Promise<null> =>{
+        await this.client.set(matchRoom.roomCode, matchRoom.getmatchRoomJSON());
         return null;
     }
 

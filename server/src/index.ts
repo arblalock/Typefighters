@@ -2,7 +2,7 @@ import { Server, Socket } from "socket.io";
 import { createServer } from "http";
 import short from "short-uuid";
 import {ClientToServerEvents, ServerToClientEvents} from "../../common/io";
-import { GameRoom, PlayerData, IPlayerData } from "../../common/game";
+import { MatchRoom, PlayerData, IPlayerData } from "../../common/game";
 import { GenRoomCode } from "./utils/utilities";
 import { RedisClient } from "./db/redis";
 
@@ -21,23 +21,23 @@ io.on('connection', async(socket) => {
     }
     console.log('a user connected');
     socket.on("requestUserSession", (playerData) => handleUserSessionReq(socket, playerData))
-    socket.on("requestNewGameRoom", (playerData) => handleNewGameRoomReq(socket, playerData))
-    socket.on("requestJoinGameRoom", (playerData) => handleJoinRoomReq(socket, playerData))
+    socket.on("requestNewmatchRoom", (playerData) => handleNewmatchRoomReq(socket, playerData))
+    socket.on("requestJoinmatchRoom", (playerData) => handleJoinRoomReq(socket, playerData))
     socket.on("disconnect", () => handleUserDisconnect(socket));
 });
 
 const handleUserDisconnect = async(socket: Socket)=>{
     for (const room of socket.rooms) {
         if (room !== socket.id) {
-            let gameRoom = await redis.getRoom(room);
-            gameRoom.removePlayerBySocketID(socket.id);
-            redis.addUpdateRoom(gameRoom);
-            if(gameRoom.getNumPlayers() < 1){
-                redis.removeRoom(gameRoom.roomCode);
+            let matchRoom = await redis.getRoom(room);
+            matchRoom.removePlayerBySocketID(socket.id);
+            redis.addUpdateRoom(matchRoom);
+            if(matchRoom.getNumPlayers() < 1){
+                redis.removeRoom(matchRoom.roomCode);
                 console.log("No players left, removing room...", room);
             }
             console.log("User left room", room);
-            socket.to(room).emit("userLeftGameRoom", gameRoom);
+            socket.to(room).emit("userLeftmatchRoom", matchRoom);
         }
       }
 }
@@ -54,18 +54,18 @@ const handleUserSessionReq = (socket: Socket, pd: IPlayerData) =>{
     socket.emit("userSessionCreatedEvent", playerData);
 }
 
-const handleNewGameRoomReq = async(socket: Socket, playerData: IPlayerData) =>{
+const handleNewmatchRoomReq = async(socket: Socket, playerData: IPlayerData) =>{
     let roomCode = await GetUnqiueRoomCode();
-    let newGameRoom = new GameRoom(roomCode);
+    let newmatchRoom = new MatchRoom(roomCode);
     let player = PlayerData.PlayerDataFromJSON(playerData);
     player.joinRoom(roomCode);
-    newGameRoom.addPlayer(player);
+    newmatchRoom.addPlayer(player);
     
     //Add room to Redis
-    await redis.addUpdateRoom(newGameRoom);
+    await redis.addUpdateRoom(newmatchRoom);
     //Join room in socket.io
     socket.join(roomCode);
-    socket.emit("gameRoomCreatedEvent", newGameRoom);
+    socket.emit("matchRoomCreatedEvent", newmatchRoom);
 }
 
 const GetUnqiueRoomCode = async() : Promise<string> =>{
@@ -82,7 +82,7 @@ const handleJoinRoomReq = (socket: Socket, playerData: IPlayerData) =>{
     //TODO: make sure to broadcast to the room that the game can start with all players
     //joined
 
-    // socket.emit("gameRoomJoinedEvent", newGameRoom);
+    // socket.emit("matchRoomJoinedEvent", newmatchRoom);
 }
 
 server.listen(process.env.SOCKETIO_PORT, async() => {
