@@ -10,7 +10,8 @@ import { Loader } from '@/components/Loader';
 export default function Page() {
     const [client, setClient] = useState<SocketClient>();
     const [matchRoom, setMatchRoom] = useState<MatchRoom>();
-    const [statusTxt, setStatusTxt] = useState<string>("Loading");
+    const [statusTxt, setStatusTxt] = useState<string>("Loading...");
+    const waitingTxt = "Waiting for friend to join..."
 
     useEffect(() => {
         setClient(new SocketClient());
@@ -20,11 +21,11 @@ export default function Page() {
         if (client) {
             client.socket.on('connect', handleSockConnect);
             client.socket.on('userSessionCreatedEvent', handleUserSessionCreated);
-            client.socket.on('matchRoomCreatedEvent', handlematchRoomCreated);
+            client.socket.on('matchRoomCreatedEvent', handleMatchRoomCreated);
             return () => {
                 client.socket.off('connect', handleSockConnect);
                 client.socket.off('userSessionCreatedEvent', handleUserSessionCreated);
-                client.socket.off('matchRoomCreatedEvent', handlematchRoomCreated);
+                client.socket.off('matchRoomCreatedEvent', handleMatchRoomCreated);
             };
         }
     }, [client]);
@@ -43,16 +44,18 @@ export default function Page() {
     const handleUserSessionCreated = (pd: IPlayerData) => {
         let playerData = PlayerData.PlayerDataFromJSON(pd);
         LocalStorageStorePlayerData(playerData);
-        client?.socket.emit("requestNewmatchRoom", playerData);
+        client?.socket.emit("requestNewMatchRoom", playerData);
     }
 
-    const handlematchRoomCreated = (gr: IMatchRoom) => {
-        //TODO: set matchRoom, change status text to waiting for friend to join
+    const handleMatchRoomCreated = (mr: IMatchRoom) => {
+        console.log(mr);
+        setMatchRoom(MatchRoom.matchRoomFromJSON(mr));
+        setStatusTxt(waitingTxt);
     }
 
     const matchRoomUrl = (): string => {
         if (matchRoom) {
-            return `${window.location}/MatchRoom/${matchRoom.roomCode}`
+            return `${window.location.origin}/MatchRoom/${matchRoom.roomCode}`
         }
         return ""
     }
@@ -60,8 +63,8 @@ export default function Page() {
     return (
         <CenterContainer>
             {matchRoom &&
-                <div>
-                    <div className="m-2 text-4xl">
+                <div className="flex-col item-center justify-center">
+                    <div className="m-2 text-4xl cl-dark-4">
                         Give your friend this link:
                     </div>
                     <div className="m-2">
@@ -69,9 +72,9 @@ export default function Page() {
                     </div>
                 </div>
             }
-            <div className="flex-col item-center justify-center m-2">
-                <div className="text-4xl m-2">{statusTxt}</div>
+            <div className="flex-col item-center justify-center">
                 <div className="m-10"><Loader /></div>
+                <div className="text-2xl m-2 mb-8 cool-blue">{statusTxt}</div>
             </div>
 
         </CenterContainer>

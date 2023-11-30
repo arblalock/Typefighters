@@ -1,7 +1,7 @@
 import { Server, Socket } from "socket.io";
 import { createServer } from "http";
 import short from "short-uuid";
-import {ClientToServerEvents, ServerToClientEvents} from "../../common/io";
+import {ClientToServerEvents, IJoinMatchReq, ServerToClientEvents} from "../../common/io";
 import { MatchRoom, PlayerData, IPlayerData } from "../../common/game";
 import { GenRoomCode } from "./utils/utilities";
 import { RedisClient } from "./db/redis";
@@ -21,8 +21,8 @@ io.on('connection', async(socket) => {
     }
     console.log('a user connected');
     socket.on("requestUserSession", (playerData) => handleUserSessionReq(socket, playerData))
-    socket.on("requestNewmatchRoom", (playerData) => handleNewmatchRoomReq(socket, playerData))
-    socket.on("requestJoinmatchRoom", (playerData) => handleJoinRoomReq(socket, playerData))
+    socket.on("requestNewMatchRoom", (playerData) => handleNewMatchRoomReq(socket, playerData))
+    socket.on("requestJoinMatchRoom", (joinMatchReq) => handleJoinMatchRoomReq(socket, joinMatchReq))
     socket.on("disconnect", () => handleUserDisconnect(socket));
 });
 
@@ -37,7 +37,7 @@ const handleUserDisconnect = async(socket: Socket)=>{
                 console.log("No players left, removing room...", room);
             }
             console.log("User left room", room);
-            socket.to(room).emit("userLeftmatchRoom", matchRoom);
+            socket.to(room).emit("userLeftMatchRoom", matchRoom);
         }
       }
 }
@@ -50,17 +50,15 @@ const handleUserSessionReq = (socket: Socket, pd: IPlayerData) =>{
         const uuid = `${short.generate()}-${Date.now()}`;
         playerData.playerId = uuid;
     }
-    console.log("User session created");
     socket.emit("userSessionCreatedEvent", playerData);
 }
 
-const handleNewmatchRoomReq = async(socket: Socket, playerData: IPlayerData) =>{
+const handleNewMatchRoomReq = async(socket: Socket, playerData: IPlayerData) =>{
     let roomCode = await GetUnqiueRoomCode();
     let newmatchRoom = new MatchRoom(roomCode);
     let player = PlayerData.PlayerDataFromJSON(playerData);
     player.joinRoom(roomCode);
     newmatchRoom.addPlayer(player);
-    
     //Add room to Redis
     await redis.addUpdateRoom(newmatchRoom);
     //Join room in socket.io
@@ -78,11 +76,28 @@ const GetUnqiueRoomCode = async() : Promise<string> =>{
 }
 
 
-const handleJoinRoomReq = (socket: Socket, playerData: IPlayerData) =>{
-    //TODO: make sure to broadcast to the room that the game can start with all players
-    //joined
+const handleJoinMatchRoomReq = async(socket: Socket, {roomCode, playerData}: IJoinMatchReq) =>{
+    //Check if room exists, if not create it
+    console.log(roomCode);
+    let matchRoom: MatchRoom;
+    let player = PlayerData.PlayerDataFromJSON(playerData);
+    let roomExists = await redis.checkRoomExists(roomCode);
+    if(roomExists == false){
+        matchRoom = new MatchRoom(roomCode);
+    }else{
+        matchRoom = await redis.getRoom(roomCode);
+    }
+    player.joinRoom(roomCode);
+    matchRoom.addPlayer(player);
 
-    // socket.emit("matchRoomJoinedEvent", newmatchRoom);
+    //Update Redis
+    redis.addUpdateRoom(matchRoom);
+
+    //Emit to room player joing
+    socket.to(roomCode).emit("matchRoomJoinedEvent", matchRoom);
+
+    //Send response
+    socket.emit("matchRoomJoinedEvent", matchRoom);
 }
 
 server.listen(process.env.SOCKETIO_PORT, async() => {
