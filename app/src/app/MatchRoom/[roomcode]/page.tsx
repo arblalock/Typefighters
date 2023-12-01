@@ -6,9 +6,10 @@ import { SocketClient } from '@/lib/socket';
 import { PlayerData, IPlayerData, IMatchRoom, MatchRoom } from '@/common/game';
 import { LocalStorageGetPlayerData, LocalStorageStorePlayerData } from '@/utils/localStorage';
 import { Loader } from '@/components/Loader';
+import { IMatchAndPlayer } from "@/common/io";
+import { getTxt } from "@/lib/text";
 
 export default function Page() {
-  // export default function Page({ params }: { params: { roomcode: string } }) {
   const [client, setClient] = useState<SocketClient>();
   const [matchRoom, setMatchRoom] = useState<MatchRoom>();
   const [statusTxt, setStatusTxt] = useState<string>("Loading");
@@ -49,8 +50,14 @@ export default function Page() {
     client?.socket.emit("requestJoinMatchRoom", { playerData: playerData, roomCode: roomCode });
   }
 
-  const handleMatchRoomJoinedEvent = (mr: MatchRoom) => {
-    console.log("joined match!")
+  const handleMatchRoomJoinedEvent = ({ matchRoom, playerData }: IMatchAndPlayer) => {
+    if (playerData === null || matchRoom === null) {
+      setStatusTxt(getTxt("ErrTooManyPlayers"));
+      return;
+    }
+    LocalStorageStorePlayerData(PlayerData.PlayerDataFromJSON(playerData))
+    console.log("joined match!");
+    console.log(matchRoom);
   }
 
   return (

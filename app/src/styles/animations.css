@@ -1,0 +1,31 @@
+.ani-fadeIn {
+    animation: aniFadeIn 2s linear;
+}
+
+@keyframes aniFadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.ani-scale-elastic {
+    animation: aniScaleElastic .8s ease-out;
+}
+
+@keyframes aniScaleElastic {
+    0% {
+        transform: scale(0);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}

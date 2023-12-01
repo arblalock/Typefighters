@@ -78,7 +78,6 @@ const GetUnqiueRoomCode = async() : Promise<string> =>{
 
 const handleJoinMatchRoomReq = async(socket: Socket, {roomCode, playerData}: IJoinMatchReq) =>{
     //Check if room exists, if not create it
-    console.log(roomCode);
     let matchRoom: MatchRoom;
     let player = PlayerData.PlayerDataFromJSON(playerData);
     let roomExists = await redis.checkRoomExists(roomCode);
@@ -87,17 +86,25 @@ const handleJoinMatchRoomReq = async(socket: Socket, {roomCode, playerData}: IJo
     }else{
         matchRoom = await redis.getRoom(roomCode);
     }
+
     player.joinRoom(roomCode);
-    matchRoom.addPlayer(player);
+    let playerInfo = matchRoom.addPlayer(player);
+
+    //If playerInfo is null there is too many players in room
+    if(playerInfo === null){
+        socket.emit("matchRoomJoinedEvent", null)
+    }
 
     //Update Redis
     redis.addUpdateRoom(matchRoom);
 
-    //Emit to room player joing
-    socket.to(roomCode).emit("matchRoomJoinedEvent", matchRoom);
+    let payload = {matchRoom: matchRoom, playerData: playerInfo}
+
+    //Emit to room player joining
+    socket.to(roomCode).emit("matchRoomJoinedEvent", payload);
 
     //Send response
-    socket.emit("matchRoomJoinedEvent", matchRoom);
+    socket.emit("matchRoomJoinedEvent", payload);
 }
 
 server.listen(process.env.SOCKETIO_PORT, async() => {

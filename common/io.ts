@@ -13,6 +13,11 @@ export interface ClientToServerEvents {
     requestJoinMatchRoom: (jmr: IJoinMatchReq) => void;
 }
 
+export interface IMatchAndPlayer {
+    playerData: IPlayerData;
+    matchRoom: IMatchRoom
+}
+
 export interface IJoinMatchReq {
     playerData: IPlayerData;
     roomCode: string;

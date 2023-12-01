@@ -24,11 +24,25 @@ export class MatchRoom {
         return Object.assign(result, data, {})
     }
 
-    addPlayer(pd: PlayerData){
-        if(this.getNumPlayers() >=2){
-            console.error("Error: Too many players in room, remove one.")
+    roomIsFull(){
+        return this.playerData.length > 1;
+    }
+
+    addPlayer(pd: PlayerData):PlayerData|null {
+
+        //Check if player is already in room
+        let updatedPd = this.checkIfPlayerIsInRoom(pd);
+        //if we do not have player in room, add them
+        if(updatedPd === undefined){
+            updatedPd = pd;
+            //Check that we do not have too many players before adding
+            if(this.getNumPlayers() >=2){
+                console.log("Too many players in room, not adding...")
+                return null;
+            }
+            this.playerData.push(pd);
         }
-        this.playerData.push(pd);
+        return updatedPd;
     }
 
     removePlayerByPID(playerID: string){
@@ -40,7 +54,7 @@ export class MatchRoom {
     }
 
     updatePlayerScore(playerId: string, newScore: Number){
-        let p = this.getPlayer(playerId);
+        let p = this.getPlayerByPlayerId(playerId);
         if(p){
             p.currentScore = newScore
         }else{
@@ -48,7 +62,28 @@ export class MatchRoom {
         }
     }
 
-    getPlayer(Id: string):PlayerData | undefined{
+    //Returns current player data if found
+    checkIfPlayerIsInRoom(pd: PlayerData): PlayerData | undefined{
+        return this.getPlayerById(pd.playerId, pd.socketId);
+    }
+
+    //Get by either player id or socket id
+    getPlayerById(playerId?: string, socketId?:string): PlayerData | undefined{
+        let result = undefined;
+        if(playerId){
+            result = this.getPlayerByPlayerId(playerId);
+        }
+        if(result === undefined && socketId){
+            result = this.getPlayerBySocketId(socketId);
+        }
+        return result;
+    }
+
+    getPlayerBySocketId(Id: string):PlayerData | undefined{
+        return this.playerData.find(x => x.socketId === Id)
+    }
+
+    getPlayerByPlayerId(Id: string):PlayerData | undefined{
         return this.playerData.find(x => x.playerId === Id)
     }
 

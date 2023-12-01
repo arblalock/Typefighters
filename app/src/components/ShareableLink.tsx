@@ -68,7 +68,7 @@ export const ShareableLink = ({ linkTxt, cb, textSize = 'xl' }: { linkTxt: strin
             {(linkIsClicked || mouseIsHovering) &&
                 <div
                     onClick={() => handleLinkCopyClick(true)}
-                    className={`absolute px-[10%] valign left-0 ${linkAnimating ? '' : 'icon-btn-dark'}`}>
+                    className={`absolute px-[8%]  valign right-0 ${linkAnimating ? '' : 'icon-btn-dark'}`}>
                     <FontAwesomeIcon icon={faCopy} />
                 </div>}
             {<span>{descTxt}</span>}
