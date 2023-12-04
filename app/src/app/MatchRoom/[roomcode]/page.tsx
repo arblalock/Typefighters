@@ -8,11 +8,16 @@ import { LocalStorageGetPlayerData, LocalStorageStorePlayerData } from '@/utils/
 import { Loader } from '@/components/Loader';
 import { IMatchAndPlayer } from "@/common/io";
 import { getTxt } from "@/lib/text";
+import { OpponentDisplay } from "@/components/OpponentDisplay";
+import { UserDisplay } from "@/components/UserDisplay";
+import { StatusLoader } from "@/components/StatusLoader";
+import { Divider } from "@/components/Divider";
 
 export default function Page() {
   const [client, setClient] = useState<SocketClient>();
   const [matchRoom, setMatchRoom] = useState<MatchRoom>();
-  const [statusTxt, setStatusTxt] = useState<string>("Loading");
+  const [statusTxt, setStatusTxt] = useState<string>(getTxt("Loading"));
+  const [joinedMatch, setJoinedMatch] = useState<Boolean>(false);
   const params = useParams()
 
   useEffect(() => {
@@ -56,16 +61,23 @@ export default function Page() {
       return;
     }
     LocalStorageStorePlayerData(PlayerData.PlayerDataFromJSON(playerData))
+    setJoinedMatch(true);
     console.log("joined match!");
     console.log(matchRoom);
   }
 
   return (
-    <CenterContainer>
-      <div className="flex-col item-center justify-center">
-        <div className="m-10"><Loader /></div>
-        <div className="text-2xl m-2 mb-8 cool-blue">{statusTxt}</div>
-      </div>
+    <CenterContainer margin={0.5}>
+      {!joinedMatch &&
+        <StatusLoader statusTxt={statusTxt} />
+      }
+      {joinedMatch &&
+        <div className="w-full">
+          <UserDisplay />
+          <Divider />
+          <OpponentDisplay statusTxt={statusTxt} />
+        </div>
+      }
     </CenterContainer>
   )
 }

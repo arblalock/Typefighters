@@ -10,6 +10,7 @@ import { Loader } from '@/components/Loader';
 import { getTxt } from "@/lib/text";
 import { IMatchAndPlayer } from "@/common/io";
 import { ConfirmationCheck } from "@/components/ConfirmationCheck";
+import { StatusLoader } from "@/components/StatusLoader";
 
 export default function Page() {
     const [client, setClient] = useState<SocketClient>();
@@ -99,12 +100,14 @@ export default function Page() {
                 </div>
             }
             <div className="flex-col item-center justify-center">
-                {!matchReady && <div className="m-10"><Loader /></div>}
-                {!matchReady && <div className={`text-2xl m-2 mb-8`}>{statusTxt}</div>}
-                {matchReady && <div className="m-6 cl-blue-1"><ConfirmationCheck /></div>}
-                {matchReady && <div className={"text-6xl m-2 mb-8 cl-blue-1 ani-fadeIn"}>{statusTxt}</div>}
+                {!matchReady && <StatusLoader statusTxt={statusTxt} />}
+                {matchReady &&
+                    <div>
+                        <div className="m-6 cl-blue-1"><ConfirmationCheck /></div>
+                        <div className={"text-6xl m-2 mb-8 cl-blue-1 ani-fadeIn"}>{statusTxt}</div>
+                    </div>
+                }
             </div>
-
         </CenterContainer>
     )
 }

@@ -1,28 +1,28 @@
 :root {
-    --p-sm: .5rem;
-    --p-md: 1rem;
-    --p-lg: 1.5rem;
-    --p-xl: 2.5rem;
-    --m-sm: .5rem;
-    --m-md: 1rem;
-    --m-lg: 1.5rem;
-    --m-xl: 2.5rem;
-    --w-sm: 2rem;
-    --w-md: 5rem;
-    --w-lg: 10rem;
-    --w-xl: 15rem;
-    --t-xs: .75rem;
-    --t-sm: .875rem;
-    --t-md: 1rem;
-    --t-lg: 1.125rem;
-    --t-xl: 1.25rem;
-    --t-2xl: 1.25rem;
-    --t-3xl: 1.875rem;
-    --t-4xl: 2rem;
-    --t-5xl: 3rem;
-    --t-6xl: 3.75rem;
-  }
+  --p-sm: .5rem;
+  --p-md: 1rem;
+  --p-lg: 1.5rem;
+  --p-xl: 2.5rem;
+  --m-sm: .5rem;
+  --m-md: 1rem;
+  --m-lg: 1.5rem;
+  --m-xl: 2.5rem;
+  --w-sm: 2rem;
+  --w-md: 5rem;
+  --w-lg: 10rem;
+  --w-xl: 15rem;
+  --t-xs: .75rem;
+  --t-sm: .875rem;
+  --t-md: 1rem;
+  --t-lg: 1.125rem;
+  --t-xl: 1.25rem;
+  --t-2xl: 1.25rem;
+  --t-3xl: 1.5rem;
+  --t-4xl: 2rem;
+  --t-5xl: 3rem;
+  --t-6xl: 3.75rem;
+}
 
-.text-xl-vw{
-    font-size: clamp(1rem, 7vw, 7rem);
+.text-xl-vw {
+  font-size: clamp(1rem, 7vw, 7rem);
 }

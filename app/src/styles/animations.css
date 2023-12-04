@@ -1,3 +1,26 @@
+.sh-link-clicked {
+    animation: linkBackgrondAni 3s linear;
+    transform: scale(.9);
+}
+
+@keyframes linkBackgrondAni {
+    5% {
+        background-color: var(--blue-1);
+    }
+
+    20% {
+        background-color: var(--blue-2);
+    }
+
+    90% {
+        background-color: var(--blue-2);
+    }
+
+    100% {
+        background-color: var(--dark-5);
+    }
+}
+
 .ani-fadeIn {
     animation: aniFadeIn 2s linear;
 }

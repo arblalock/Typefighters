@@ -1,8 +1,16 @@
 import { ReactNode } from 'react';
 
-export const CenterContainer = ({ children }: { children: ReactNode }) => {
+type CenterContProps = {
+    margin?: number;
+    children: ReactNode
+}
+
+export const CenterContainer = ({ children, margin = 1 }: CenterContProps) => {
     return (
-        <div className="flex flex-col m-4 items-center text-center justify-center">
+        <div style={{
+            margin: `${margin}rem`,
+        }}
+            className="flex flex-col items-center text-center justify-center">
             {children}
         </div>
     )

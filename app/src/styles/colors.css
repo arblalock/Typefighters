@@ -7,6 +7,7 @@
   --dark-5: #292b35;
   --dark-6: #353845;
   --dark-7: #a5acc5;
+  --dark-8: #35383e;
   --blue-1: #6a80e6;
   --blue-2: #586dc9;
   --blue-3: #5c619a;
@@ -15,10 +16,18 @@
   --disabled-font-color: rgb(78, 78, 78);
 }
 
+.cl-dark-6 {
+  color: var(--dark-6);
+}
+
 .cl-dark-7 {
   color: var(--dark-7);
 }
 
 .cl-blue-1 {
   color: var(--blue-1);
+}
+
+.cl-blue-3 {
+  color: var(--blue-3);
 }
