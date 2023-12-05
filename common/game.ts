@@ -79,6 +79,10 @@ export class MatchRoom {
         return result;
     }
 
+    getMyOpponent(myPlayerId: string):PlayerData | undefined {
+        return this.playerData.find(x=> x.playerId !== myPlayerId);
+    }
+
     getPlayerBySocketId(Id: string):PlayerData | undefined{
         return this.playerData.find(x => x.socketId === Id)
     }
@@ -106,6 +110,8 @@ export interface IPlayerData{
     currentRoom: string | undefined;
     createdDate: string;
     currentScore: Number;
+    readyForMatchStart: boolean;
+    myOpponentId: string | undefined;
 }
 
 export interface PlayerData extends IPlayerData { }
@@ -118,14 +124,17 @@ export class PlayerData {
         this.currentRoom = currentRoom;
         this.currentScore = 0;
         this.createdDate = new Date().toISOString();
+        this.readyForMatchStart = false;
     }
 
-    joinRoom(roomCode: string){
+    joinRoom(roomCode: string, opponentId = undefined){
         this.currentRoom = roomCode;
+        this.myOpponentId = opponentId;
     }
 
     leaveRoom(){
-        this.currentRoom = null;
+        this.currentRoom = undefined;
+        this.myOpponentId = undefined;
     }
 
     static PlayerDataFromJSON = (data: any) :PlayerData =>{

@@ -1,9 +1,13 @@
 import { CenterContainer } from "./CenterContainer"
 
-export const Divider = () => {
+type DivProps = {
+    margin?: number;
+}
+
+export const Divider = ({ margin = 1 }: DivProps) => {
     return (
-        <CenterContainer margin={2}>
+        <CenterContainer margin={margin}>
             <div className="w-full h-px dark-bg-6" />
         </CenterContainer>
     )
-}
+}   

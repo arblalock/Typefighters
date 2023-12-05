@@ -86,8 +86,11 @@ const handleJoinMatchRoomReq = async(socket: Socket, {roomCode, playerData}: IJo
     }else{
         matchRoom = await redis.getRoom(roomCode);
     }
-
-    player.joinRoom(roomCode);
+    let opId = undefined;
+    if(matchRoom.getNumPlayers() === 1){
+        opId = matchRoom.getMyOpponent(player.playerId);
+    }
+    player.joinRoom(roomCode, opId);
     let playerInfo = matchRoom.addPlayer(player);
 
     //If playerInfo is null there is too many players in room

@@ -17,6 +17,7 @@ export default function Page() {
     const [matchRoom, setMatchRoom] = useState<MatchRoom>();
     const [statusTxt, setStatusTxt] = useState<string>(getTxt("Loading"));
     const [matchReady, setMatchReady] = useState<boolean>(false);
+    const [myPlayerData, setMyPlayerData] = useState<PlayerData>();
     const router = useRouter();
     const redirectTimeout = 2;
 
@@ -62,18 +63,33 @@ export default function Page() {
     const handleUserSessionCreated = (pd: IPlayerData) => {
         let playerData = PlayerData.PlayerDataFromJSON(pd);
         LocalStorageStorePlayerData(playerData);
+        setMyPlayerData(playerData);
         client?.socket.emit("requestNewMatchRoom", playerData);
     }
 
     const handleMatchRoomCreated = (mr: IMatchRoom) => {
-        console.log(mr);
-        setMatchRoom(MatchRoom.matchRoomFromJSON(mr));
+        let matchRoom = MatchRoom.matchRoomFromJSON(mr);
+        setMatchRoom(matchRoom);
+        let playerDat = matchRoom.getPlayerById(myPlayerData?.playerId);
+        if (playerDat) {
+            updateMyPlayerData(playerDat);
+        }
         setStatusTxt(getTxt("FriendJoinWaiting"));
     }
 
-    const handleMatchRoomJoinedEvent = ({ matchRoom, playerData }: IMatchAndPlayer) => {
+    const updateMyPlayerData = (playerData: PlayerData) => {
+        LocalStorageStorePlayerData(playerData);
+        setMyPlayerData(playerData);
+    }
+
+    const handleMatchRoomJoinedEvent = ({ matchRoom }: IMatchAndPlayer) => {
         let mr = MatchRoom.matchRoomFromJSON(matchRoom);
         if (mr.roomIsFull()) {
+            let pdat = myPlayerData;
+            if (pdat && pdat.playerId) {
+                pdat.myOpponentId = mr.getMyOpponent(pdat.playerId)?.playerId
+                updateMyPlayerData(pdat);
+            }
             setStatusTxt(getTxt("MatchReady"));
             setMatchReady(true);
             //Note: setMatchReady triggers a useEffect hook to do page redirect

@@ -7,7 +7,8 @@ export const LocalStorageGetPlayerData = () : PlayerData | null => {
     return result ? PlayerData.PlayerDataFromJSON(result) : null;
 }
 
-export const LocalStorageStorePlayerData = (pd: PlayerData) => {
+export const LocalStorageStorePlayerData = (pd?: PlayerData) => {
+    if(!pd) return;
     localStorage.setItem(playerDataKey, pd.getPlayerJSON());
 }
 

@@ -11,6 +11,8 @@ type dictonary =
     "ErrTooManyPlayers" |
     "Loading" |
     "FriendJoinWaiting" |
+    "FriendWaitReady" |
+    "FriendReady" |
     "MatchReady"
     ;
 
@@ -21,5 +23,7 @@ const english: Record<dictonary, string> = {
     If problem persists try creating new game.`,
     Loading : "Loading",
     FriendJoinWaiting: "Waiting for friend to join...",
+    FriendWaitReady: "Friend joined, waiting for them to be ready...",
+    FriendReady: "Friend ready to start!",
     MatchReady: "Match Ready!",
 }

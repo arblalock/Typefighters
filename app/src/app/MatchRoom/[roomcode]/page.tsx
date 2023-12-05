@@ -5,17 +5,18 @@ import { CenterContainer } from "@/components/CenterContainer";
 import { SocketClient } from '@/lib/socket';
 import { PlayerData, IPlayerData, IMatchRoom, MatchRoom } from '@/common/game';
 import { LocalStorageGetPlayerData, LocalStorageStorePlayerData } from '@/utils/localStorage';
-import { Loader } from '@/components/Loader';
 import { IMatchAndPlayer } from "@/common/io";
 import { getTxt } from "@/lib/text";
 import { OpponentDisplay } from "@/components/OpponentDisplay";
-import { UserDisplay } from "@/components/UserDisplay";
+import { UserDisplay, UserInput } from "@/components/UserDisplay";
 import { StatusLoader } from "@/components/StatusLoader";
 import { Divider } from "@/components/Divider";
 
 export default function Page() {
   const [client, setClient] = useState<SocketClient>();
   const [matchRoom, setMatchRoom] = useState<MatchRoom>();
+  const [myPlayerData, setMyPlayerData] = useState<PlayerData>();
+  const [opponentPlayerData, setOpponentPlayerData] = useState<PlayerData>();
   const [statusTxt, setStatusTxt] = useState<string>(getTxt("Loading"));
   const [joinedMatch, setJoinedMatch] = useState<Boolean>(false);
   const params = useParams()
@@ -50,9 +51,14 @@ export default function Page() {
 
   const handleUserSessionCreated = (pd: IPlayerData) => {
     let playerData = PlayerData.PlayerDataFromJSON(pd);
-    LocalStorageStorePlayerData(playerData);
+    updateMyPlayerData(playerData);
     let roomCode = params.roomcode;
     client?.socket.emit("requestJoinMatchRoom", { playerData: playerData, roomCode: roomCode });
+  }
+
+  const updateMyPlayerData = (pd: PlayerData) => {
+    setMyPlayerData(pd);
+    LocalStorageStorePlayerData(pd);
   }
 
   const handleMatchRoomJoinedEvent = ({ matchRoom, playerData }: IMatchAndPlayer) => {
@@ -60,10 +66,33 @@ export default function Page() {
       setStatusTxt(getTxt("ErrTooManyPlayers"));
       return;
     }
-    LocalStorageStorePlayerData(PlayerData.PlayerDataFromJSON(playerData))
-    setJoinedMatch(true);
-    console.log("joined match!");
+    let pDat = PlayerData.PlayerDataFromJSON(playerData);
+    //If the player is joined is me then update my info
+    if (pDat.playerId === myPlayerData?.playerId) {
+      setJoinedMatch(true);
+      updateMyPlayerData(pDat);
+      console.log("joined match!");
+    }
+    //If this is my opponent joining
+    else {
+      console.log("opponent joined match!");
+      setOpponentPlayerData(pDat);
+      if (myPlayerData !== undefined) {
+        let myPdat = myPlayerData;
+        myPdat.myOpponentId = pDat.playerId;
+        updateMyPlayerData(pDat);
+      }
+    }
     console.log(matchRoom);
+    matchUpdate(MatchRoom.matchRoomFromJSON(matchRoom));
+  }
+
+  const matchUpdate = (matchRoom: MatchRoom) => {
+    setMatchRoom(matchRoom);
+  }
+
+  const handleUserInput = (payload: UserInput) => {
+    console.log("testing2");
   }
 
   return (
@@ -73,9 +102,9 @@ export default function Page() {
       }
       {joinedMatch &&
         <div className="w-full">
-          <UserDisplay />
-          <Divider />
-          <OpponentDisplay statusTxt={statusTxt} />
+          <UserDisplay playerData={opponentPlayerData} matchData={matchRoom} inputCB={handleUserInput} />
+          <Divider margin={2} />
+          <OpponentDisplay playerData={opponentPlayerData} matchData={matchRoom} />
         </div>
       }
     </CenterContainer>
