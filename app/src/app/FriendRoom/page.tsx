@@ -84,7 +84,7 @@ export default function Page() {
 
     const handleMatchRoomJoinedEvent = ({ matchRoom }: IMatchAndPlayer) => {
         let mr = MatchRoom.matchRoomFromJSON(matchRoom);
-        if (mr.roomIsFull()) {
+        if (mr.allPlayersJoined()) {
             let pdat = myPlayerData;
             if (pdat && pdat.playerId) {
                 pdat.myOpponentId = mr.getMyOpponent(pdat.playerId)?.playerId

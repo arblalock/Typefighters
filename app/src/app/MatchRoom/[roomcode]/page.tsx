@@ -25,6 +25,14 @@ export default function Page() {
     setClient(new SocketClient());
   }, []);
 
+  //Keep our match and player data in sync
+  useEffect(() => {
+    console.log(myPlayerData);
+    if (myPlayerData && myPlayerData.playerId && matchRoom) {
+      syncMatchPlayerData(matchRoom, myPlayerData.playerId);
+    }
+  }, [myPlayerData, matchRoom]);
+
   useEffect(() => {
     if (client) {
       client.socket.on('connect', handleSockConnect);
@@ -51,14 +59,34 @@ export default function Page() {
 
   const handleUserSessionCreated = (pd: IPlayerData) => {
     let playerData = PlayerData.PlayerDataFromJSON(pd);
+    let roomCode = params.roomcode.toString();
     updateMyPlayerData(playerData);
-    let roomCode = params.roomcode;
     client?.socket.emit("requestJoinMatchRoom", { playerData: playerData, roomCode: roomCode });
   }
 
   const updateMyPlayerData = (pd: PlayerData) => {
+    if (matchRoom) pd.currentRoom = matchRoom.roomCode;
+    if (opponentPlayerData) pd.myOpponentId = opponentPlayerData.playerId;
     setMyPlayerData(pd);
     LocalStorageStorePlayerData(pd);
+  }
+
+  //Sync our local state with data from server
+  const syncMatchPlayerData = (matchData: MatchRoom, myPlayerId: string) => {
+    console.log("server sync...");
+    let oppDat = matchData.getMyOpponent(myPlayerId);
+    let myDat = matchData.getPlayerById(myPlayerId);
+    if (oppDat) {
+      setOpponentPlayerData(oppDat);
+      if (myDat) myDat.myOpponentId = oppDat.playerId;
+    }
+    if (myDat) {
+      updateMyPlayerData(myDat);
+      if (joinedMatch === false) {
+        setJoinedMatch(true);
+      }
+    }
+    setMatchRoom(matchData);
   }
 
   const handleMatchRoomJoinedEvent = ({ matchRoom, playerData }: IMatchAndPlayer) => {
@@ -66,29 +94,16 @@ export default function Page() {
       setStatusTxt(getTxt("ErrTooManyPlayers"));
       return;
     }
-    let pDat = PlayerData.PlayerDataFromJSON(playerData);
-    //If the player is joined is me then update my info
-    if (pDat.playerId === myPlayerData?.playerId) {
-      setJoinedMatch(true);
-      updateMyPlayerData(pDat);
-      console.log("joined match!");
-    }
-    //If this is my opponent joining
-    else {
-      console.log("opponent joined match!");
-      setOpponentPlayerData(pDat);
-      if (myPlayerData !== undefined) {
-        let myPdat = myPlayerData;
-        myPdat.myOpponentId = pDat.playerId;
-        updateMyPlayerData(pDat);
-      }
-    }
-    console.log(matchRoom);
-    matchUpdate(MatchRoom.matchRoomFromJSON(matchRoom));
-  }
+    let matchData = MatchRoom.matchRoomFromJSON(matchRoom);
 
-  const matchUpdate = (matchRoom: MatchRoom) => {
-    setMatchRoom(matchRoom);
+    //If we have all match data then update players
+    if (myPlayerData && myPlayerData.playerId) {
+      syncMatchPlayerData(matchData, myPlayerData.playerId)
+    }
+    else {
+      setMatchRoom(matchData);
+    }
+    console.log(matchData);
   }
 
   const handleUserInput = (payload: UserInput) => {

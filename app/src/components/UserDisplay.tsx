@@ -1,6 +1,7 @@
 import { MatchRoom, PlayerData } from "@/common/game";
 import { Button } from "./Button"
 import { CenterContainer } from "./CenterContainer"
+import { getTxt } from "@/lib/text";
 // import { useEffect, useState } from "react";
 
 type UserDspProps = {
@@ -38,7 +39,7 @@ export const UserDisplay = ({ playerData, matchData, inputCB }: UserDspProps) =>
     return (
         <CenterContainer margin={0}>
             {!playerData || playerData.readyForMatchStart == false &&
-                <Button text="Click when ready" callback={handlePlayerClickReady} textSize="3xl" buttonStyle="primary" />
+                <Button text={getTxt("ReadyBtn")} callback={handlePlayerClickReady} textSize="3xl" buttonStyle="primary" />
             }
         </CenterContainer>
     )

@@ -24,7 +24,7 @@ export class MatchRoom {
         return Object.assign(result, data, {})
     }
 
-    roomIsFull(){
+    allPlayersJoined(){
         return this.playerData.length > 1;
     }
 

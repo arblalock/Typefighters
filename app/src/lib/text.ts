@@ -13,7 +13,8 @@ type dictonary =
     "FriendJoinWaiting" |
     "FriendWaitReady" |
     "FriendReady" |
-    "MatchReady"
+    "MatchReady" |
+    "ReadyBtn"
     ;
 
 
@@ -26,4 +27,5 @@ const english: Record<dictonary, string> = {
     FriendWaitReady: "Friend joined, waiting for them to be ready...",
     FriendReady: "Friend ready to start!",
     MatchReady: "Match Ready!",
+    ReadyBtn : "Click when ready"
 }
