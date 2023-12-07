@@ -20,8 +20,12 @@ export class MatchRoom {
         if(typeof data === "string"){
             data = JSON.parse(data);
         }
-        let result = new MatchRoom("");
-        return Object.assign(result, data, {})
+        let newObj = new MatchRoom("");
+        let matchObj:MatchRoom;
+        matchObj = Object.assign(newObj, data, {})
+        let playerObjs = matchObj.playerData.map(x=> PlayerData.PlayerDataFromJSON(x));
+        matchObj.playerData = playerObjs;
+        return matchObj;
     }
 
     allPlayersJoined(){

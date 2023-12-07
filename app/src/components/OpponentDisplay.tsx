@@ -22,7 +22,7 @@ export const OpponentDisplay = ({ playerData, matchData }: OpponentDspProps) => 
 
     return (
         <CenterContainer>
-            <StatusLoader statusTxt={getStatusTxt()} />
+            <StatusLoader loaderMargin={1} statusTxtMargin={2.5} statusTxt={getStatusTxt()} />
         </CenterContainer>
     )
 }

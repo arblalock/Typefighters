@@ -1,6 +1,7 @@
 .btn {
     border: 1px solid;
-    transition: background-color .1s ease-in-out, transform .2s ease-in-out, ;
+    transition: background-color .1s ease-in-out,
+        transform .2s ease-in-out, border-color .2s ease-in-out;
 }
 
 .btn:hover {
@@ -23,6 +24,17 @@
 .btn-primary:hover {
     background-color: var(--dark-8);
 }
+
+.btn-alt1 {
+    background-color: var(--dark-9);
+    border-color: white;
+}
+
+.btn-alt1:hover {
+    background-color: var(--dark-9);
+    border-color: var(--blue-1);
+}
+
 
 .btn-disabled {
     background-color: var(--disabled-primary);

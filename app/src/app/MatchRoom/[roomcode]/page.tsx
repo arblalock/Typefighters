@@ -27,7 +27,6 @@ export default function Page() {
 
   //Keep our match and player data in sync
   useEffect(() => {
-    console.log(myPlayerData);
     if (myPlayerData && myPlayerData.playerId && matchRoom) {
       syncMatchPlayerData(matchRoom, myPlayerData.playerId);
     }
@@ -87,6 +86,8 @@ export default function Page() {
       }
     }
     setMatchRoom(matchData);
+    console.log(matchData);
+    console.log(myDat);
   }
 
   const handleMatchRoomJoinedEvent = ({ matchRoom, playerData }: IMatchAndPlayer) => {
@@ -103,7 +104,6 @@ export default function Page() {
     else {
       setMatchRoom(matchData);
     }
-    console.log(matchData);
   }
 
   const handleUserInput = (payload: UserInput) => {
@@ -117,7 +117,7 @@ export default function Page() {
       }
       {joinedMatch &&
         <div className="w-full">
-          <UserDisplay playerData={opponentPlayerData} matchData={matchRoom} inputCB={handleUserInput} />
+          <UserDisplay playerData={myPlayerData} matchData={matchRoom} inputCB={handleUserInput} />
           <Divider margin={2} />
           <OpponentDisplay playerData={opponentPlayerData} matchData={matchRoom} />
         </div>

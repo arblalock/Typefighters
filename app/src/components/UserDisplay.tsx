@@ -38,8 +38,8 @@ export const UserDisplay = ({ playerData, matchData, inputCB }: UserDspProps) =>
 
     return (
         <CenterContainer margin={0}>
-            {!playerData || playerData.readyForMatchStart == false &&
-                <Button text={getTxt("ReadyBtn")} callback={handlePlayerClickReady} textSize="3xl" buttonStyle="primary" />
+            {(!playerData || playerData.readyForMatchStart) == false &&
+                <Button text={getTxt("ReadyBtn")} callback={handlePlayerClickReady} textSize="3xl" buttonStyle="alt1" />
             }
         </CenterContainer>
     )
