@@ -23,6 +23,7 @@ io.on('connection', async(socket) => {
     socket.on("requestUserSession", (playerData) => handleUserSessionReq(socket, playerData))
     socket.on("requestNewMatchRoom", (playerData) => handleNewMatchRoomReq(socket, playerData))
     socket.on("requestJoinMatchRoom", (joinMatchReq) => handleJoinMatchRoomReq(socket, joinMatchReq))
+    socket.on("userReadyForMatchUpdate", (playerData) => handleReadyForMatchStartReq(socket, playerData))
     socket.on("disconnect", () => handleUserDisconnect(socket));
 });
 
@@ -75,7 +76,6 @@ const GetUnqiueRoomCode = async() : Promise<string> =>{
     }
 }
 
-
 const handleJoinMatchRoomReq = async(socket: Socket, {roomCode, playerData}: IJoinMatchReq) =>{
     //Check if room exists, if not create it
     let matchRoom: MatchRoom;
@@ -108,6 +108,16 @@ const handleJoinMatchRoomReq = async(socket: Socket, {roomCode, playerData}: IJo
 
     //Send response
     socket.emit("matchRoomJoinedEvent", payload);
+}
+
+const handleReadyForMatchStartReq = async(socket: Socket, playerData: IPlayerData) =>{
+    let pd = PlayerData.PlayerDataFromJSON(playerData);
+    let gr = await redis.getRoom(pd.currentRoom);
+    if(gr){
+        gr.updatePlayerData(pd);
+        await redis.addUpdateRoom(gr);
+    }
+    socket.to(gr.roomCode).emit("userReadyForMatchUpdate", pd);
 }
 
 server.listen(process.env.SOCKETIO_PORT, async() => {

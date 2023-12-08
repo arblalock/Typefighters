@@ -6,7 +6,11 @@ type StatusLoadProps = {
     statusTxtMargin?: number
 }
 
-export const StatusLoader = ({ statusTxt, loaderMargin = 2.5, statusTxtMargin = 0.5 }: StatusLoadProps) => {
+export const StatusLoader = (
+    { statusTxt,
+        loaderMargin = 2.5,
+        statusTxtMargin = 0.5
+    }: StatusLoadProps) => {
     return (
         <div className="flex-col item-center justify-center">
             <Loader margin={loaderMargin} />

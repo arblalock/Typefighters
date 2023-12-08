@@ -3,14 +3,16 @@ import {IPlayerData, IMatchRoom } from "./game";
 export interface ServerToClientEvents {
     matchRoomCreatedEvent: (mr: IMatchRoom) => void;
     matchRoomJoinedEvent: (mr: IMatchRoom) => void;
-    userSessionCreatedEvent: (pdu: IPlayerData) => void;
+    userSessionCreatedEvent: (pd: IPlayerData) => void;
     userLeftMatchRoom: (mr: IMatchRoom) => void;
+    userReadyForMatchUpdate: (pd: IPlayerData) => void;
 }
 
 export interface ClientToServerEvents {
-    requestUserSession: (pdu: IPlayerData) => void;
-    requestNewMatchRoom: (pdu: IPlayerData) => void;
+    requestUserSession: (pd: IPlayerData) => void;
+    requestNewMatchRoom: (pd: IPlayerData) => void;
     requestJoinMatchRoom: (jmr: IJoinMatchReq) => void;
+    userReadyForMatchUpdate: (pd: IPlayerData) => void;
 }
 
 export interface IMatchAndPlayer {

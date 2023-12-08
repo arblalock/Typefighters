@@ -57,13 +57,8 @@ export class MatchRoom {
         this.playerData = this.playerData.filter(x=>x.socketId !== socketID);
     }
 
-    updatePlayerScore(playerId: string, newScore: Number){
-        let p = this.getPlayerByPlayerId(playerId);
-        if(p){
-            p.currentScore = newScore
-        }else{
-            console.error("Player does not exist in this room")
-        }
+    updatePlayerData(pd: PlayerData){
+        this.playerData = this.playerData.map(x=> x.playerId === pd.playerId ? pd: x);
     }
 
     //Returns current player data if found

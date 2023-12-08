@@ -2,7 +2,8 @@ import { MatchRoom, PlayerData } from "@/common/game";
 import { Button } from "./Button"
 import { CenterContainer } from "./CenterContainer"
 import { getTxt } from "@/lib/text";
-// import { useEffect, useState } from "react";
+import { ConfirmationCheck } from "./ConfirmationCheck";
+import { useEffect, useState } from "react";
 
 type UserDspProps = {
     playerData: PlayerData | undefined;
@@ -21,26 +22,45 @@ export type UserInput = {
     input: string
 }
 
-export const UserDisplay = ({ playerData, matchData, inputCB }: UserDspProps) => {
+export const UserDisplay = ({ playerData: pd, matchData: md, inputCB }: UserDspProps) => {
 
-    // const [matchRoom, setMatchRoom] = useState<MatchRoom>();
-    // const [myPlayerData, setMyPlayerData] = useState<PlayerData>();
+    const [matchData, setMatchRoom] = useState<MatchRoom>();
+    const [playerData, setMyPlayerData] = useState<PlayerData>();
 
-    // useEffect(() => {
-    //     setMatchRoom(matchData);
-    //     setMyPlayerData(playerData);
-    // }, [playerData, matchData]);
+    useEffect(() => {
+        setMatchRoom(md);
+        setMyPlayerData(pd);
+    }, [pd, md]);
 
     const handlePlayerClickReady = () => {
-        console.log("testing");
         inputCB({ "inputType": "isReadyClick", "input": "" })
+    }
+
+    const getUserDisplay = () => {
+        console.log("user dsp ready for match:", playerData?.readyForMatchStart);
+        if (!playerData || playerData.readyForMatchStart === false) {
+            return (
+                <Button
+                    text={getTxt("ReadyBtn")}
+                    callback={handlePlayerClickReady}
+                    textSize="3xl"
+                    buttonStyle="alt1"
+                />
+            )
+        }
+        else if (playerData.readyForMatchStart === true) {
+            return (
+                <div>
+                    <div className="m-6 cl-blue-1"><ConfirmationCheck /></div>
+                    <div className="text-lg">Ready for match!</div>
+                </div>
+            )
+        }
     }
 
     return (
         <CenterContainer margin={0}>
-            {(!playerData || playerData.readyForMatchStart) == false &&
-                <Button text={getTxt("ReadyBtn")} callback={handlePlayerClickReady} textSize="3xl" buttonStyle="alt1" />
-            }
+            {getUserDisplay()}
         </CenterContainer>
     )
 }

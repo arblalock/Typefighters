@@ -6,7 +6,6 @@ type LoaderProps = {
 
 export const Loader = ({ margin = 2.5 }: LoaderProps) => {
     return (
-        // <div className="m-10">
         <div style={{
             margin: `${margin}rem`,
         }}>
