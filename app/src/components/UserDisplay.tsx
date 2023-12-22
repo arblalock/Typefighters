@@ -37,7 +37,6 @@ export const UserDisplay = ({ playerData: pd, matchData: md, inputCB }: UserDspP
     }
 
     const getUserDisplay = () => {
-        console.log("user dsp ready for match:", playerData?.readyForMatchStart);
         if (!playerData || playerData.readyForMatchStart === false) {
             return (
                 <Button

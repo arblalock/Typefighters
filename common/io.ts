@@ -12,7 +12,7 @@ export interface ClientToServerEvents {
     requestUserSession: (pd: IPlayerData) => void;
     requestNewMatchRoom: (pd: IPlayerData) => void;
     requestJoinMatchRoom: (jmr: IJoinMatchReq) => void;
-    userReadyForMatchUpdate: (pd: IPlayerData) => void;
+    userReadyForMatchReq: (pd: IPlayerData) => void;
 }
 
 export interface IMatchAndPlayer {

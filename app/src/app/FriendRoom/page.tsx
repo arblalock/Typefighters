@@ -6,18 +6,19 @@ import { ShareableLink } from '@/components/ShareableLink';
 import { SocketClient } from '@/lib/socket';
 import { PlayerData, IPlayerData, IMatchRoom, MatchRoom } from '@/common/game';
 import { LocalStorageGetPlayerData, LocalStorageStorePlayerData } from '@/utils/localStorage';
-import { Loader } from '@/components/Loader';
 import { getTxt } from "@/lib/text";
 import { IMatchAndPlayer } from "@/common/io";
 import { ConfirmationCheck } from "@/components/ConfirmationCheck";
 import { StatusLoader } from "@/components/StatusLoader";
+import { useMatchData, usePlayerData } from "@/hooks/gameDataEffects";
 
 export default function Page() {
     const [client, setClient] = useState<SocketClient>();
-    const [matchRoom, setMatchRoom] = useState<MatchRoom>();
+    const [matchRoom, setMatchData] = useMatchData();
     const [statusTxt, setStatusTxt] = useState<string>(getTxt("Loading"));
     const [matchReady, setMatchReady] = useState<boolean>(false);
-    const [myPlayerData, setMyPlayerData] = useState<PlayerData>();
+    const [myPlayerData, setMyPlayerData] = usePlayerData();
+    const [matchUrl, setMatchUrl] = useState<string>();
     const router = useRouter();
     const redirectTimeout = 2;
 
@@ -41,13 +42,13 @@ export default function Page() {
     }, [client]);
 
     useEffect(() => {
-        if (matchReady) {
+        if (matchReady && matchUrl) {
             const timer = setTimeout(() => {
-                router.push(matchRoomUrl())
+                router.push(matchUrl)
             }, redirectTimeout * 1000);
             return () => clearTimeout(timer);
         }
-    }, [matchReady]);
+    }, [matchReady, matchUrl]);
 
     const handleSockConnect = () => {
         if (!client) return;
@@ -69,11 +70,12 @@ export default function Page() {
 
     const handleMatchRoomCreated = (mr: IMatchRoom) => {
         let matchRoom = MatchRoom.matchRoomFromJSON(mr);
-        setMatchRoom(matchRoom);
+        setMatchData(matchRoom);
         let playerDat = matchRoom.getPlayerById(myPlayerData?.playerId);
         if (playerDat) {
             updateMyPlayerData(playerDat);
         }
+        setMatchUrl(`${window.location.origin}/MatchRoom/${matchRoom.roomCode}`)
         setStatusTxt(getTxt("FriendJoinWaiting"));
     }
 
@@ -96,22 +98,22 @@ export default function Page() {
         }
     }
 
-    const matchRoomUrl = (): string => {
-        if (matchRoom) {
-            return `${window.location.origin}/MatchRoom/${matchRoom.roomCode}`
-        }
-        return ""
-    }
+    // const matchRoomUrl = (): string => {
+    //     if (matchRoom) {
+    //         return `${window.location.origin}/MatchRoom/${matchRoom.roomCode}`
+    //     }
+    //     return ""
+    // }
 
     return (
         <CenterContainer>
-            {matchRoom &&
+            {matchRoom && matchUrl &&
                 <div className="flex-col item-center justify-center">
                     <div className="m-2 text-4xl cl-dark-7">
                         Give your friend this link:
                     </div>
                     <div className="m-2">
-                        <ShareableLink linkTxt={matchRoomUrl()} />
+                        <ShareableLink linkTxt={matchUrl} />
                     </div>
                 </div>
             }

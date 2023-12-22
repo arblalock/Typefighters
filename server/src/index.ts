@@ -23,7 +23,7 @@ io.on('connection', async(socket) => {
     socket.on("requestUserSession", (playerData) => handleUserSessionReq(socket, playerData))
     socket.on("requestNewMatchRoom", (playerData) => handleNewMatchRoomReq(socket, playerData))
     socket.on("requestJoinMatchRoom", (joinMatchReq) => handleJoinMatchRoomReq(socket, joinMatchReq))
-    socket.on("userReadyForMatchUpdate", (playerData) => handleReadyForMatchStartReq(socket, playerData))
+    socket.on("userReadyForMatchReq", (playerData) => handleReadyForMatchStartReq(socket, playerData))
     socket.on("disconnect", () => handleUserDisconnect(socket));
 });
 

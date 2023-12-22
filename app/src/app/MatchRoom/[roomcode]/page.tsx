@@ -11,19 +11,16 @@ import { OpponentDisplay } from "@/components/OpponentDisplay";
 import { UserDisplay, UserInput } from "@/components/UserDisplay";
 import { StatusLoader } from "@/components/StatusLoader";
 import { Divider } from "@/components/Divider";
+import { useMatchData, usePlayerData } from "@/hooks/gameDataEffects";
 
 export default function Page() {
   const [client, setClient] = useState<SocketClient>();
-  const [matchRoom, setMatchRoom] = useState<MatchRoom>();
-  const [myPlayerData, setMyPlayerData] = useState<PlayerData>();
-  const [opponentPlayerData, setOpponentPlayerData] = useState<PlayerData>();
+  const [matchRoom, setMatchData] = useMatchData();
+  const [myPlayerData, setMyPlayerData] = usePlayerData();
+  const [opponentPlayerData, setOpponentPlayerData] = usePlayerData();
   const [statusTxt, setStatusTxt] = useState<string>(getTxt("Loading"));
   const [joinedMatch, setJoinedMatch] = useState<Boolean>(false);
   const params = useParams()
-
-  const useMyPlayerData = () => {
-
-  }
 
   useEffect(() => {
     setClient(new SocketClient());
@@ -71,15 +68,18 @@ export default function Page() {
   }
 
   const updateMyPlayerData = (pd: PlayerData) => {
-    if (matchRoom) pd.currentRoom = matchRoom.roomCode;
     if (opponentPlayerData) pd.myOpponentId = opponentPlayerData.playerId;
+    if (matchRoom) {
+      pd.currentRoom = matchRoom.roomCode;
+      matchRoom.updatePlayerData(pd);
+      setMatchData(matchRoom);
+    }
     setMyPlayerData(pd);
     LocalStorageStorePlayerData(pd);
   }
 
   //Sync our local state with data from server
   const syncMatchPlayerData = (matchData: MatchRoom, myPlayerId?: string) => {
-    console.log("server sync...");
     //Attempt to get our data if we have it yet
     let myDat = matchData.getPlayerById(myPlayerId, client?.socketID);
     if (myDat && myDat.playerId) {
@@ -93,7 +93,7 @@ export default function Page() {
         setJoinedMatch(true);
       }
     }
-    setMatchRoom(matchData);
+    setMatchData(matchData);
     console.log(matchData);
     console.log(myDat);
   }
@@ -106,28 +106,26 @@ export default function Page() {
     let matchData = MatchRoom.matchRoomFromJSON(matchRoom);
 
     //REMOVE AFTER DEBUG
-    console.log("clearing");
-    let pd = PlayerData.PlayerDataFromJSON(playerData);
-    pd.readyForMatchStart = false;
-    matchData.updatePlayerData(pd);
+    // console.log("clearing");
+    // let pd = PlayerData.PlayerDataFromJSON(playerData);
+    // pd.readyForMatchStart = false;
+    // matchData.updatePlayerData(pd);
 
     //If we have all match data then update players
     if (myPlayerData && myPlayerData.playerId) {
       syncMatchPlayerData(matchData, myPlayerData.playerId)
     }
     else {
-      setMatchRoom(matchData);
+      setMatchData(matchData);
     }
   }
 
   const handleUserReadyForMatchUpdate = (pd: PlayerData) => {
-    console.log("testing213123123");
     let md = matchRoom;
     if (md) {
       md?.updatePlayerData(pd);
-      syncMatchPlayerData(md, myPlayerData?.playerId,)
+      syncMatchPlayerData(md, myPlayerData?.playerId)
     }
-    console.log("Ready update: ", pd);
   }
 
   const readyToStartClick = () => {
@@ -135,7 +133,7 @@ export default function Page() {
       let uDat = myPlayerData;
       uDat.readyForMatchStart = true;
       updateMyPlayerData(uDat);
-      client?.socket.emit("userReadyForMatchUpdate", uDat);
+      client?.socket.emit("userReadyForMatchReq", uDat);
     }
   }
 
