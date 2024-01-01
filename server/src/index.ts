@@ -23,7 +23,7 @@ io.on('connection', async(socket) => {
     socket.on("requestUserSession", (playerData) => handleUserSessionReq(socket, playerData))
     socket.on("requestNewMatchRoom", (playerData) => handleNewMatchRoomReq(socket, playerData))
     socket.on("requestJoinMatchRoom", (joinMatchReq) => handleJoinMatchRoomReq(socket, joinMatchReq))
-    socket.on("userReadyForMatchReq", (playerData) => handleReadyForMatchStartReq(socket, playerData))
+    socket.on("userMatchUpdate", (playerData) => handleUserMatchUpdate(socket, playerData))
     socket.on("disconnect", () => handleUserDisconnect(socket));
 });
 
@@ -38,7 +38,7 @@ const handleUserDisconnect = async(socket: Socket)=>{
                 console.log("No players left, removing room...", room);
             }
             console.log("User left room", room);
-            socket.to(room).emit("userLeftMatchRoom", matchRoom);
+            socket.to(room).emit("userLeftMatchRoomEvent", matchRoom);
         }
       }
 }
@@ -109,15 +109,15 @@ const handleJoinMatchRoomReq = async(socket: Socket, {roomCode, playerData}: IJo
     //Send response
     socket.emit("matchRoomJoinedEvent", payload);
 }
-
-const handleReadyForMatchStartReq = async(socket: Socket, playerData: IPlayerData) =>{
+const handleUserMatchUpdate = async(socket: Socket, playerData: IPlayerData) =>{
     let pd = PlayerData.PlayerDataFromJSON(playerData);
     let gr = await redis.getRoom(pd.currentRoom);
     if(gr){
         gr.updatePlayerData(pd);
         await redis.addUpdateRoom(gr);
     }
-    socket.to(gr.roomCode).emit("userReadyForMatchUpdate", pd);
+    console.log("user update for room: ", gr.roomCode);
+    socket.to(gr.roomCode).emit("userMatchUpdateEvent", pd);
 }
 
 server.listen(process.env.SOCKETIO_PORT, async() => {

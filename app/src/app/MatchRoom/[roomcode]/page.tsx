@@ -38,13 +38,13 @@ export default function Page() {
       client.socket.on('connect', handleSockConnect);
       client.socket.on('userSessionCreatedEvent', handleUserSessionCreated);
       client.socket.on('matchRoomJoinedEvent', handleMatchRoomJoinedEvent);
-      client.socket.on('userReadyForMatchUpdate', handleUserReadyForMatchUpdate);
+      client.socket.on('userMatchUpdateEvent', handleUserDataUpdateEvent);
 
       return () => {
         client.socket.off('connect', handleSockConnect);
         client.socket.off('userSessionCreatedEvent', handleUserSessionCreated);
         client.socket.off('matchRoomJoinedEvent', handleMatchRoomJoinedEvent);
-        client.socket.off('userReadyForMatchUpdate', handleUserReadyForMatchUpdate);
+        client.socket.off('userMatchUpdateEvent', handleUserDataUpdateEvent);
       };
     }
   }, [client]);
@@ -80,7 +80,7 @@ export default function Page() {
 
   //Sync our local state with data from server
   const syncMatchPlayerData = (matchData: MatchRoom, myPlayerId?: string) => {
-    //Attempt to get our data if we have it yet
+    //Attempt to get our data from match data
     let myDat = matchData.getPlayerById(myPlayerId, client?.socketID);
     if (myDat && myDat.playerId) {
       let oppDat = matchData.getMyOpponent(myDat.playerId);
@@ -94,8 +94,6 @@ export default function Page() {
       }
     }
     setMatchData(matchData);
-    console.log(matchData);
-    console.log(myDat);
   }
 
   const handleMatchRoomJoinedEvent = ({ matchRoom, playerData }: IMatchAndPlayer) => {
@@ -106,10 +104,11 @@ export default function Page() {
     let matchData = MatchRoom.matchRoomFromJSON(matchRoom);
 
     //REMOVE AFTER DEBUG
-    // console.log("clearing");
-    // let pd = PlayerData.PlayerDataFromJSON(playerData);
-    // pd.readyForMatchStart = false;
-    // matchData.updatePlayerData(pd);
+    console.log("clearing");
+    let pd = PlayerData.PlayerDataFromJSON(playerData);
+    pd.readyForMatchStart = false;
+    matchData.updatePlayerData(pd);
+    client?.socket.emit("userMatchUpdate", pd);
 
     //If we have all match data then update players
     if (myPlayerData && myPlayerData.playerId) {
@@ -120,8 +119,9 @@ export default function Page() {
     }
   }
 
-  const handleUserReadyForMatchUpdate = (pd: PlayerData) => {
+  const handleUserDataUpdateEvent = (pd: PlayerData) => {
     let md = matchRoom;
+    console.log("user update")
     if (md) {
       md?.updatePlayerData(pd);
       syncMatchPlayerData(md, myPlayerData?.playerId)
@@ -133,7 +133,7 @@ export default function Page() {
       let uDat = myPlayerData;
       uDat.readyForMatchStart = true;
       updateMyPlayerData(uDat);
-      client?.socket.emit("userReadyForMatchReq", uDat);
+      client?.socket.emit("userMatchUpdate", uDat);
     }
   }
 
