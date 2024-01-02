@@ -26,10 +26,9 @@ export default function Page() {
     setClient(new SocketClient());
   }, []);
 
-  //Keep our match and player data in sync
   useEffect(() => {
     if (myPlayerData && myPlayerData.playerId && matchRoom) {
-      syncMatchPlayerData(matchRoom, myPlayerData.playerId);
+      syncMatchData(matchRoom, myPlayerData.playerId);
     }
   }, [myPlayerData, matchRoom]);
 
@@ -63,32 +62,36 @@ export default function Page() {
   const handleUserSessionCreated = (pd: IPlayerData) => {
     let playerData = PlayerData.PlayerDataFromJSON(pd);
     let roomCode = params.roomcode.toString();
-    updateMyPlayerData(playerData);
+    updateMyLocalPlayerData(playerData);
+    console.log("session created");
     client?.socket.emit("requestJoinMatchRoom", { playerData: playerData, roomCode: roomCode });
   }
 
-  const updateMyPlayerData = (pd: PlayerData) => {
+  const updateMyLocalPlayerData = (pd: PlayerData) => {
     if (opponentPlayerData) pd.myOpponentId = opponentPlayerData.playerId;
     if (matchRoom) {
       pd.currentRoom = matchRoom.roomCode;
       matchRoom.updatePlayerData(pd);
       setMatchData(matchRoom);
     }
+    else {
+      let roomCode = params.roomcode.toString();
+      pd.currentRoom = roomCode;
+    }
+    console.log(pd)
     setMyPlayerData(pd);
     LocalStorageStorePlayerData(pd);
   }
 
   //Sync our local state with data from server
-  const syncMatchPlayerData = (matchData: MatchRoom, myPlayerId?: string) => {
+  const syncMatchData = (matchData: MatchRoom, myPlayerId?: string) => {
     //Attempt to get our data from match data
     let myDat = matchData.getPlayerById(myPlayerId, client?.socketID);
     if (myDat && myDat.playerId) {
       let oppDat = matchData.getMyOpponent(myDat.playerId);
       if (oppDat) {
         setOpponentPlayerData(oppDat);
-        if (myDat) myDat.myOpponentId = oppDat.playerId;
       }
-      updateMyPlayerData(myDat);
       if (joinedMatch === false) {
         setJoinedMatch(true);
       }
@@ -112,7 +115,8 @@ export default function Page() {
 
     //If we have all match data then update players
     if (myPlayerData && myPlayerData.playerId) {
-      syncMatchPlayerData(matchData, myPlayerData.playerId)
+      syncMatchData(matchData, myPlayerData.playerId)
+      updateMyLocalPlayerData(pd);
     }
     else {
       setMatchData(matchData);
@@ -123,8 +127,9 @@ export default function Page() {
     let md = matchRoom;
     console.log("user update")
     if (md) {
+      // console.log(pd)
       md?.updatePlayerData(pd);
-      syncMatchPlayerData(md, myPlayerData?.playerId)
+      syncMatchData(md, myPlayerData?.playerId)
     }
   }
 
@@ -132,7 +137,8 @@ export default function Page() {
     if (myPlayerData) {
       let uDat = myPlayerData;
       uDat.readyForMatchStart = true;
-      updateMyPlayerData(uDat);
+      console.log(myPlayerData);
+      updateMyLocalPlayerData(uDat);
       client?.socket.emit("userMatchUpdate", uDat);
     }
   }

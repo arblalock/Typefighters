@@ -93,15 +93,17 @@ const handleJoinMatchRoomReq = async(socket: Socket, {roomCode, playerData}: IJo
     player.joinRoom(roomCode, opId);
     let playerInfo = matchRoom.addPlayer(player);
 
-    //If playerInfo is null there is too many players in room
+    //If playerInfo is null there are too many players in room
     if(playerInfo === null){
         socket.emit("matchRoomJoinedEvent", null)
     }
 
     //Update Redis
     redis.addUpdateRoom(matchRoom);
-
     let payload = {matchRoom: matchRoom, playerData: playerInfo}
+
+    //Join on socketIO
+    socket.join(roomCode);
 
     //Emit to room player joining
     socket.to(roomCode).emit("matchRoomJoinedEvent", payload);
@@ -109,15 +111,15 @@ const handleJoinMatchRoomReq = async(socket: Socket, {roomCode, playerData}: IJo
     //Send response
     socket.emit("matchRoomJoinedEvent", payload);
 }
+
 const handleUserMatchUpdate = async(socket: Socket, playerData: IPlayerData) =>{
     let pd = PlayerData.PlayerDataFromJSON(playerData);
     let gr = await redis.getRoom(pd.currentRoom);
     if(gr){
         gr.updatePlayerData(pd);
         await redis.addUpdateRoom(gr);
+        socket.to(gr.roomCode).emit("userMatchUpdateEvent", pd);
     }
-    console.log("user update for room: ", gr.roomCode);
-    socket.to(gr.roomCode).emit("userMatchUpdateEvent", pd);
 }
 
 server.listen(process.env.SOCKETIO_PORT, async() => {
