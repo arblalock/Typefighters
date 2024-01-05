@@ -1,11 +1,11 @@
-import {IPlayerData, IMatchRoom } from "./game";
+import {IPlayerData, IMatchRoom, MatchRoom } from "./game";
 
 export interface ServerToClientEvents {
     matchRoomCreatedEvent: (mr: IMatchRoom) => void;
     matchRoomJoinedEvent: (mr: IMatchRoom) => void;
     userSessionCreatedEvent: (pd: IPlayerData) => void;
     userLeftMatchRoomEvent: (mr: IMatchRoom) => void;
-    userMatchUpdateEvent:(pd: IPlayerData) => void; 
+    matchUpdateEvent:(mr: MatchRoom) => void; 
 }
 
 export interface ClientToServerEvents {

@@ -104,7 +104,7 @@ export class MatchRoom {
 }
 
 export interface IPlayerData{
-    socketId: string;
+    socketId: string | undefined;
     playerId: string | undefined;
     currentRoom: string | undefined;
     createdDate: string;
@@ -117,7 +117,7 @@ export interface PlayerData extends IPlayerData { }
 
 export class PlayerData {
 
-    constructor(socketId: string, playerId?: string, currentRoom?: string){
+    constructor(socketId?: string, playerId?: string, currentRoom?: string){
         this.socketId = socketId;
         this.playerId = playerId;
         this.currentRoom = currentRoom;

@@ -27,8 +27,9 @@ export default function Page() {
   }, []);
 
   useEffect(() => {
-    if (myPlayerData && myPlayerData.playerId && matchRoom) {
-      syncMatchData(matchRoom, myPlayerData.playerId);
+    let pd = LocalStorageGetPlayerData();
+    if (pd && pd.playerId && matchRoom) {
+      syncMatchData(matchRoom, pd.playerId);
     }
   }, [myPlayerData, matchRoom]);
 
@@ -37,13 +38,13 @@ export default function Page() {
       client.socket.on('connect', handleSockConnect);
       client.socket.on('userSessionCreatedEvent', handleUserSessionCreated);
       client.socket.on('matchRoomJoinedEvent', handleMatchRoomJoinedEvent);
-      client.socket.on('userMatchUpdateEvent', handleUserDataUpdateEvent);
+      client.socket.on('matchUpdateEvent', handleMatchDataUpdateEvent);
 
       return () => {
         client.socket.off('connect', handleSockConnect);
         client.socket.off('userSessionCreatedEvent', handleUserSessionCreated);
         client.socket.off('matchRoomJoinedEvent', handleMatchRoomJoinedEvent);
-        client.socket.off('userMatchUpdateEvent', handleUserDataUpdateEvent);
+        client.socket.off('matchUpdateEvent', handleMatchDataUpdateEvent);
       };
     }
   }, [client]);
@@ -52,9 +53,7 @@ export default function Page() {
     if (!client) return;
     let playerData = LocalStorageGetPlayerData();
     if (playerData == null) {
-      playerData = new PlayerData(client.socket.id);
-    } else {
-      playerData.socketId = client.socket.id;
+      playerData = new PlayerData();
     }
     client?.socket.emit("requestUserSession", playerData)
   }
@@ -62,41 +61,10 @@ export default function Page() {
   const handleUserSessionCreated = (pd: IPlayerData) => {
     let playerData = PlayerData.PlayerDataFromJSON(pd);
     let roomCode = params.roomcode.toString();
-    updateMyLocalPlayerData(playerData);
-    console.log("session created");
+    updatePlayerData(playerData);
+    console.log("session joined");
+    console.log(playerData);
     client?.socket.emit("requestJoinMatchRoom", { playerData: playerData, roomCode: roomCode });
-  }
-
-  const updateMyLocalPlayerData = (pd: PlayerData) => {
-    if (opponentPlayerData) pd.myOpponentId = opponentPlayerData.playerId;
-    if (matchRoom) {
-      pd.currentRoom = matchRoom.roomCode;
-      matchRoom.updatePlayerData(pd);
-      setMatchData(matchRoom);
-    }
-    else {
-      let roomCode = params.roomcode.toString();
-      pd.currentRoom = roomCode;
-    }
-    console.log(pd)
-    setMyPlayerData(pd);
-    LocalStorageStorePlayerData(pd);
-  }
-
-  //Sync our local state with data from server
-  const syncMatchData = (matchData: MatchRoom, myPlayerId?: string) => {
-    //Attempt to get our data from match data
-    let myDat = matchData.getPlayerById(myPlayerId, client?.socketID);
-    if (myDat && myDat.playerId) {
-      let oppDat = matchData.getMyOpponent(myDat.playerId);
-      if (oppDat) {
-        setOpponentPlayerData(oppDat);
-      }
-      if (joinedMatch === false) {
-        setJoinedMatch(true);
-      }
-    }
-    setMatchData(matchData);
   }
 
   const handleMatchRoomJoinedEvent = ({ matchRoom, playerData }: IMatchAndPlayer) => {
@@ -104,41 +72,68 @@ export default function Page() {
       setStatusTxt(getTxt("ErrTooManyPlayers"));
       return;
     }
+
     let matchData = MatchRoom.matchRoomFromJSON(matchRoom);
-
-    //REMOVE AFTER DEBUG
-    console.log("clearing");
     let pd = PlayerData.PlayerDataFromJSON(playerData);
-    pd.readyForMatchStart = false;
-    matchData.updatePlayerData(pd);
-    client?.socket.emit("userMatchUpdate", pd);
+    let myPlayer = LocalStorageGetPlayerData();
+    //Check if this is me joining
+    if (pd.playerId === myPlayer?.playerId) {
 
-    //If we have all match data then update players
-    if (myPlayerData && myPlayerData.playerId) {
-      syncMatchData(matchData, myPlayerData.playerId)
-      updateMyLocalPlayerData(pd);
+      //REMOVE AFTER DEBUG
+      console.log("clearing");
+      pd.readyForMatchStart = false;
+      matchData.updatePlayerData(pd);
+      client?.socket.emit("matchUpdate", pd);
+      //END REMOVE AFTER DEBUG
+
+      updatePlayerData(pd);
+      syncMatchData(matchData, pd.playerId);
+      if (joinedMatch === false) {
+        setJoinedMatch(true);
+      }
     }
     else {
-      setMatchData(matchData);
+      syncMatchData(matchData);
     }
   }
 
-  const handleUserDataUpdateEvent = (pd: PlayerData) => {
-    let md = matchRoom;
-    console.log("user update")
-    if (md) {
-      // console.log(pd)
-      md?.updatePlayerData(pd);
-      syncMatchData(md, myPlayerData?.playerId)
+  const handleMatchDataUpdateEvent = (mr: MatchRoom) => {
+    mr = MatchRoom.matchRoomFromJSON(mr);
+    if (matchRoom) {
+      syncMatchData(mr, LocalStorageGetPlayerData()?.playerId)
     }
+  }
+
+  const updatePlayerData = (pd: PlayerData) => {
+    if (opponentPlayerData) pd.myOpponentId = opponentPlayerData.playerId;
+    pd.currentRoom = params.roomcode.toString();
+    if (matchRoom) {
+      matchRoom.updatePlayerData(pd);
+      setMatchData(matchRoom);
+    }
+    setMyPlayerData(pd);
+    LocalStorageStorePlayerData(pd);
+  }
+
+  //Sync our local state with data from server
+  const syncMatchData = (matchData: MatchRoom, myPlayerId?: string) => {
+    //Attempt to get our data from match data
+    let myDat = matchData.getPlayerById(myPlayerId);
+    if (myDat && myDat.playerId) {
+      let oppDat = matchData.getMyOpponent(myDat.playerId);
+      if (oppDat) {
+        setOpponentPlayerData(oppDat);
+      }
+    }
+    setMatchData(matchData);
   }
 
   const readyToStartClick = () => {
-    if (myPlayerData) {
-      let uDat = myPlayerData;
+    let pd = LocalStorageGetPlayerData();
+    if (pd?.playerId) {
+      let uDat = pd;
       uDat.readyForMatchStart = true;
-      console.log(myPlayerData);
-      updateMyLocalPlayerData(uDat);
+      updatePlayerData(uDat);
       client?.socket.emit("userMatchUpdate", uDat);
     }
   }

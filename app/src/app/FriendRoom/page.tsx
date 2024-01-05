@@ -54,9 +54,7 @@ export default function Page() {
         if (!client) return;
         let playerData = LocalStorageGetPlayerData();
         if (playerData == null) {
-            playerData = new PlayerData(client.socket.id);
-        } else {
-            playerData.socketId = client.socket.id;
+            playerData = new PlayerData();
         }
         client?.socket.emit("requestUserSession", playerData)
     }

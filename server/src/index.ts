@@ -28,6 +28,8 @@ io.on('connection', async(socket) => {
 });
 
 const handleUserDisconnect = async(socket: Socket)=>{
+    console.log("disconnection, socket id ", socket.id)
+    console.log("rooms ", socket.rooms)
     for (const room of socket.rooms) {
         if (room !== socket.id) {
             let matchRoom = await redis.getRoom(room);
@@ -58,6 +60,7 @@ const handleNewMatchRoomReq = async(socket: Socket, playerData: IPlayerData) =>{
     let roomCode = await GetUnqiueRoomCode();
     let newmatchRoom = new MatchRoom(roomCode);
     let player = PlayerData.PlayerDataFromJSON(playerData);
+    player.socketId = socket.id;
     player.joinRoom(roomCode);
     newmatchRoom.addPlayer(player);
     //Add room to Redis
@@ -91,6 +94,7 @@ const handleJoinMatchRoomReq = async(socket: Socket, {roomCode, playerData}: IJo
         opId = matchRoom.getMyOpponent(player.playerId);
     }
     player.joinRoom(roomCode, opId);
+    player.socketId = socket.id;
     let playerInfo = matchRoom.addPlayer(player);
 
     //If playerInfo is null there are too many players in room
@@ -114,11 +118,12 @@ const handleJoinMatchRoomReq = async(socket: Socket, {roomCode, playerData}: IJo
 
 const handleUserMatchUpdate = async(socket: Socket, playerData: IPlayerData) =>{
     let pd = PlayerData.PlayerDataFromJSON(playerData);
+    pd.socketId = socket.id
     let gr = await redis.getRoom(pd.currentRoom);
     if(gr){
         gr.updatePlayerData(pd);
         await redis.addUpdateRoom(gr);
-        socket.to(gr.roomCode).emit("userMatchUpdateEvent", pd);
+        socket.to(gr.roomCode).emit("matchUpdateEvent", gr);
     }
 }
 

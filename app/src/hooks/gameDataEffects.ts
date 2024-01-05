@@ -6,7 +6,7 @@ export const usePlayerData = (defaultData = {}): [PlayerData, Function] => {
     const updMyPlayerData = (pd: PlayerData) => {
         //Since we are storing a class in state we need to do deep copy
         //using JSON
-        setMyPlayerData(pd.getPlayerJSON())
+        setMyPlayerData(pd?.getPlayerJSON())
     }
     return [PlayerData.PlayerDataFromJSON(myPlayerData), updMyPlayerData];
   }
