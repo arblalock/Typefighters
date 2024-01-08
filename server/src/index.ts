@@ -5,6 +5,7 @@ import {ClientToServerEvents, IJoinMatchReq, ServerToClientEvents} from "../../c
 import { MatchRoom, PlayerData, IPlayerData } from "../../common/game";
 import { GenRoomCode } from "./utils/utilities";
 import { RedisClient } from "./db/redis";
+import { GameDict } from "./dict/gameDict";
 
 let redis:RedisClient;
 
@@ -13,6 +14,7 @@ const io = new Server<
     ClientToServerEvents,
     ServerToClientEvents
 >(server, {'transports':['websocket']});
+const gameDict = new GameDict();
 
 
 io.on('connection', async(socket) => {
@@ -124,7 +126,22 @@ const handleUserMatchUpdate = async(socket: Socket, playerData: IPlayerData) =>{
         gr.updatePlayerData(pd);
         await redis.addUpdateRoom(gr);
         socket.to(gr.roomCode).emit("matchUpdateEvent", gr);
+
+        //Check if we can start the match
+        if(gr.matchIsRunning === false && gr.currentRound === 0 && gr.checkAllPlayersReady()){
+            startNewMatch(socket, gr);
+        }
     }
+}
+
+const startNewMatch = async(socket: Socket, gr: MatchRoom) =>{
+    let txtR = gameDict.getRandomTxt(gr.completedTxtIds);
+    gr.currentTxt = txtR.txt;
+    gr.addCompletedTxtId(txtR.idx);
+    gr.matchIsRunning = true;
+    gr.currentRound = 1;
+    await redis.addUpdateRoom(gr);
+    socket.to(gr.roomCode).emit("matchUpdateEvent", gr);
 }
 
 server.listen(process.env.SOCKETIO_PORT, async() => {

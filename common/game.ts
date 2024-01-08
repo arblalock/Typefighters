@@ -3,6 +3,9 @@ export interface IMatchRoom{
     createdDate: string;
     playerData: Array<PlayerData>;
     currentRound: Number;
+    matchIsRunning: boolean;
+    completedTxtIds: Array<Number>;
+    currentTxt: string;
 }
 
 export interface MatchRoom extends IMatchRoom { }
@@ -13,7 +16,10 @@ export class MatchRoom {
         this.roomCode = roomCode;
         this.createdDate = new Date().toISOString();
         this.currentRound = 0;
-        this.playerData = []
+        this.playerData = [];
+        this.matchIsRunning = false;
+        this.completedTxtIds = [];
+        this.currentTxt = "";
     }
 
     static matchRoomFromJSON = (data: any) :MatchRoom =>{
@@ -33,7 +39,6 @@ export class MatchRoom {
     }
 
     addPlayer(pd: PlayerData):PlayerData|null {
-
         //Check if player is already in room
         let updatedPd = this.checkIfPlayerIsInRoom(pd);
         //if we do not have player in room, add them
@@ -98,6 +103,20 @@ export class MatchRoom {
         return this.playerData.length;
     }
 
+    checkAllPlayersReady():boolean{
+        if(!this.allPlayersJoined) return false;
+            for(let u of this.playerData){
+                if(u.readyForMatchStart === false){
+                    return false
+                }
+            }
+            return true;
+    }
+
+    addCompletedTxtId(idx:number){
+        this.completedTxtIds.push(idx);
+    }
+    
     getmatchRoomJSON = ():string =>{
         return JSON.stringify(this);
     }
