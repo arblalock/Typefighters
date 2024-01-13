@@ -3,12 +3,13 @@ import { Button } from "./Button"
 import { CenterContainer } from "./CenterContainer"
 import { getTxt } from "@/lib/text";
 import { ConfirmationCheck } from "./ConfirmationCheck";
-import { useEffect, useState } from "react";
+import { Children, ReactNode, useEffect, useState } from "react";
 
 type UserDspProps = {
     playerData: PlayerData | undefined;
     matchData: MatchRoom | undefined;
     inputCB: UserInputCallback;
+    children: ReactNode;
 }
 
 export type UserInputCallback = (payLoad: UserInput) => void;
@@ -22,7 +23,7 @@ export type UserInput = {
     input: string
 }
 
-export const UserDisplay = ({ playerData: pd, matchData: md, inputCB }: UserDspProps) => {
+export const UserDisplay = ({ playerData: pd, matchData: md, inputCB, children }: UserDspProps) => {
 
     const [matchData, setMatchRoom] = useState<MatchRoom>();
     const [playerData, setMyPlayerData] = useState<PlayerData>();
@@ -59,6 +60,7 @@ export const UserDisplay = ({ playerData: pd, matchData: md, inputCB }: UserDspP
 
     return (
         <CenterContainer margin={0}>
+            {children}
             {getUserDisplay()}
         </CenterContainer>
     )

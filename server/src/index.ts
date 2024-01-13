@@ -116,6 +116,9 @@ const handleJoinMatchRoomReq = async(socket: Socket, {roomCode, playerData}: IJo
 
     //Send response
     socket.emit("matchRoomJoinedEvent", payload);
+
+    //Check if we need to start the match
+    checkStartMatch(socket, matchRoom);
 }
 
 const handleUserMatchUpdate = async(socket: Socket, playerData: IPlayerData) =>{
@@ -127,10 +130,14 @@ const handleUserMatchUpdate = async(socket: Socket, playerData: IPlayerData) =>{
         await redis.addUpdateRoom(gr);
         socket.to(gr.roomCode).emit("matchUpdateEvent", gr);
 
-        //Check if we can start the match
-        if(gr.matchIsRunning === false && gr.currentRound === 0 && gr.checkAllPlayersReady()){
-            startNewMatch(socket, gr);
-        }
+        //Check if we need to start the match
+        checkStartMatch(socket, gr);
+    }
+}
+
+const checkStartMatch = (socket: Socket, gr: MatchRoom) => {
+    if(gr.matchIsRunning === false && gr.currentRound === 0 && gr.checkAllPlayersReady()){
+        startNewMatch(socket, gr);
     }
 }
 

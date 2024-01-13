@@ -91,17 +91,10 @@ export default function Page() {
                 updateMyPlayerData(pdat);
             }
             setStatusTxt(getTxt("MatchReady"));
-            setMatchReady(true);
             //Note: setMatchReady triggers a useEffect hook to do page redirect
+            setMatchReady(true);
         }
     }
-
-    // const matchRoomUrl = (): string => {
-    //     if (matchRoom) {
-    //         return `${window.location.origin}/MatchRoom/${matchRoom.roomCode}`
-    //     }
-    //     return ""
-    // }
 
     return (
         <CenterContainer>

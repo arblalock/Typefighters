@@ -12,6 +12,7 @@ import { UserDisplay, UserInput } from "@/components/UserDisplay";
 import { StatusLoader } from "@/components/StatusLoader";
 import { Divider } from "@/components/Divider";
 import { useMatchData, usePlayerData } from "@/hooks/gameDataEffects";
+import { Scoreboard } from "@/components/Scoreboard";
 
 export default function Page() {
   const [client, setClient] = useState<SocketClient>();
@@ -155,7 +156,9 @@ export default function Page() {
       }
       {joinedMatch &&
         <div className="w-full">
-          <UserDisplay playerData={myPlayerData} matchData={matchRoom} inputCB={handleUserInput} />
+          <UserDisplay playerData={myPlayerData} matchData={matchRoom} inputCB={handleUserInput}>
+            <Scoreboard matchData={matchRoom} />
+          </UserDisplay>
           <Divider margin={2} />
           <OpponentDisplay playerData={opponentPlayerData} matchData={matchRoom} />
         </div>
