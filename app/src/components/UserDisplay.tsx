@@ -9,7 +9,6 @@ type UserDspProps = {
     playerData: PlayerData | undefined;
     matchData: MatchRoom | undefined;
     inputCB: UserInputCallback;
-    children: ReactNode;
 }
 
 export type UserInputCallback = (payLoad: UserInput) => void;
@@ -23,7 +22,7 @@ export type UserInput = {
     input: string
 }
 
-export const UserDisplay = ({ playerData: pd, matchData: md, inputCB, children }: UserDspProps) => {
+export const UserDisplay = ({ playerData: pd, matchData: md, inputCB }: UserDspProps) => {
 
     const [matchData, setMatchRoom] = useState<MatchRoom>();
     const [playerData, setMyPlayerData] = useState<PlayerData>();
@@ -60,7 +59,6 @@ export const UserDisplay = ({ playerData: pd, matchData: md, inputCB, children }
 
     return (
         <CenterContainer margin={0}>
-            {children}
             {getUserDisplay()}
         </CenterContainer>
     )

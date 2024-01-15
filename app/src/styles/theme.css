@@ -7,6 +7,10 @@
     background-color: var(--dark-2);
 }
 
+.dark-bg-3 {
+    background-color: var(--dark-3);
+}
+
 .dark-bg-4 {
     background-color: var(--dark-4);
 }

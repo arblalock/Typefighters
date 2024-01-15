@@ -13,6 +13,7 @@ import { StatusLoader } from "@/components/StatusLoader";
 import { Divider } from "@/components/Divider";
 import { useMatchData, usePlayerData } from "@/hooks/gameDataEffects";
 import { Scoreboard } from "@/components/Scoreboard";
+import { GameInfoPanel } from "@/components/GameInfoPanel";
 
 export default function Page() {
   const [client, setClient] = useState<SocketClient>();
@@ -155,12 +156,21 @@ export default function Page() {
         <StatusLoader statusTxt={statusTxt} />
       }
       {joinedMatch &&
-        <div className="w-full">
-          <UserDisplay playerData={myPlayerData} matchData={matchRoom} inputCB={handleUserInput}>
-            <Scoreboard matchData={matchRoom} />
-          </UserDisplay>
-          <Divider margin={2} />
-          <OpponentDisplay playerData={opponentPlayerData} matchData={matchRoom} />
+        <div className="w-full flex flex-row">
+          <div className="basis-10/12 items-center">
+            <UserDisplay playerData={myPlayerData} matchData={matchRoom} inputCB={handleUserInput}>
+            </UserDisplay>
+            <Divider margin={2} />
+            <OpponentDisplay playerData={opponentPlayerData} matchData={matchRoom} />
+          </div>
+          <div className="basis-2/12 items-center justify-center">
+            <GameInfoPanel>
+              <Scoreboard matchData={matchRoom} myData={myPlayerData} oppData={opponentPlayerData} />
+            </GameInfoPanel>
+            <GameInfoPanel>
+              <Scoreboard matchData={matchRoom} myData={myPlayerData} oppData={opponentPlayerData} />
+            </GameInfoPanel>
+          </div>
         </div>
       }
     </CenterContainer>
