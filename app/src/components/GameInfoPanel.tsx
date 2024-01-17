@@ -9,7 +9,7 @@ export const GameInfoPanel = ({ children }: GameInfoPanelProps) => {
         <div className="w-full">
             <div
                 style={{ borderColor: "var(--dark-4)" }}
-                className="w-30 text-slate-400 p-5 border-solid border dark-bg-1"
+                className="w-30 text-slate-400 mb-5 p-5 border-solid border dark-bg-1"
             >
                 {children}
             </div>

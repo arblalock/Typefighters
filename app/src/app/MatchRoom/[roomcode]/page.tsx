@@ -14,6 +14,8 @@ import { Divider } from "@/components/Divider";
 import { useMatchData, usePlayerData } from "@/hooks/gameDataEffects";
 import { Scoreboard } from "@/components/Scoreboard";
 import { GameInfoPanel } from "@/components/GameInfoPanel";
+import { ScoreHistory } from "@/components/ScoreHistory";
+import { GameCenterDisplay } from "@/components/GameCenterDisplay";
 
 export default function Page() {
   const [client, setClient] = useState<SocketClient>();
@@ -160,7 +162,7 @@ export default function Page() {
           <div className="basis-10/12 items-center">
             <UserDisplay playerData={myPlayerData} matchData={matchRoom} inputCB={handleUserInput}>
             </UserDisplay>
-            <Divider margin={2} />
+            <GameCenterDisplay matchData={matchRoom} />
             <OpponentDisplay playerData={opponentPlayerData} matchData={matchRoom} />
           </div>
           <div className="basis-2/12 items-center justify-center">
@@ -168,7 +170,7 @@ export default function Page() {
               <Scoreboard matchData={matchRoom} myData={myPlayerData} oppData={opponentPlayerData} />
             </GameInfoPanel>
             <GameInfoPanel>
-              <Scoreboard matchData={matchRoom} myData={myPlayerData} oppData={opponentPlayerData} />
+              <ScoreHistory matchData={matchRoom} myData={myPlayerData} oppData={opponentPlayerData} />
             </GameInfoPanel>
           </div>
         </div>

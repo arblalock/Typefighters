@@ -128,6 +128,7 @@ export interface IPlayerData{
     currentRoom: string | undefined;
     createdDate: string;
     currentScore: Number;
+    gamesWon: Number;
     readyForMatchStart: boolean;
     myOpponentId: string | undefined;
 }
@@ -143,6 +144,7 @@ export class PlayerData {
         this.currentScore = 0;
         this.createdDate = new Date().toISOString();
         this.readyForMatchStart = false;
+        this.gamesWon = 0;
     }
 
     joinRoom(roomCode: string, opponentId = undefined){
