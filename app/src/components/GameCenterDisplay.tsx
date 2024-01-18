@@ -12,10 +12,10 @@ export const GameCenterDisplay = ({ matchData }: GameCenterDspProps) => {
     }
 
     return (
-        <div>
+        <div className="flex justify-center">
             {matchData?.matchIsRunning == false && <Divider margin={2} />}
             {matchData?.matchIsRunning &&
-                <div>
+                <div className="w-[98%] text-slate-350 my-8 text-3xl p-7 dark-bg-2 border border-slate-800 rounded">
                     {getDisplayText()}
                 </div>
             }

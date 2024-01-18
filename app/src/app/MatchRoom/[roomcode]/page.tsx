@@ -10,12 +10,12 @@ import { getTxt } from "@/lib/text";
 import { OpponentDisplay } from "@/components/OpponentDisplay";
 import { UserDisplay, UserInput } from "@/components/UserDisplay";
 import { StatusLoader } from "@/components/StatusLoader";
-import { Divider } from "@/components/Divider";
 import { useMatchData, usePlayerData } from "@/hooks/gameDataEffects";
 import { Scoreboard } from "@/components/Scoreboard";
 import { GameInfoPanel } from "@/components/GameInfoPanel";
 import { ScoreHistory } from "@/components/ScoreHistory";
 import { GameCenterDisplay } from "@/components/GameCenterDisplay";
+import { Config } from "@/common/config";
 
 export default function Page() {
   const [client, setClient] = useState<SocketClient>();
@@ -24,6 +24,7 @@ export default function Page() {
   const [opponentPlayerData, setOpponentPlayerData] = usePlayerData();
   const [statusTxt, setStatusTxt] = useState<string>(getTxt("Loading"));
   const [joinedMatch, setJoinedMatch] = useState<Boolean>(false);
+  const [startCountdownTimer, setStartCountdownTimer] = useState<number>(Config.roundStartCountdownDuration);
   const params = useParams()
 
   useEffect(() => {
@@ -130,6 +131,22 @@ export default function Page() {
       }
     }
     setMatchData(matchData);
+
+    //Check if we need to start match
+    CheckStartMatch(matchData);
+  }
+
+  const CheckStartMatch = (mr: MatchRoom) => {
+    if (mr.matchIsRunning && mr.currentRound === 1 && startCountdownTimer !== 0) {
+      let cdwn = setInterval(() => {
+        if (startCountdownTimer > 0) {
+          setStartCountdownTimer(startCountdownTimer - 1);
+        }
+        else {
+          clearInterval(cdwn);
+        }
+      }, 1000)
+    }
   }
 
   const readyToStartClick = () => {
