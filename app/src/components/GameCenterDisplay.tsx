@@ -3,11 +3,16 @@ import { Divider } from "./Divider";
 
 type GameCenterDspProps = {
     matchData: MatchRoom | undefined;
+    timer: number;
 }
 
-export const GameCenterDisplay = ({ matchData }: GameCenterDspProps) => {
+export const GameCenterDisplay = ({ matchData, timer }: GameCenterDspProps) => {
 
-    const getDisplayText = () => {
+    const getDisplayText = (): string => {
+        if (matchData?.matchIsRunning && matchData.currentRound === 1 && timer > 0) {
+            return `Game starting in ${timer}...`
+        }
+
         return "Testing"
     }
 

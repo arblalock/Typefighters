@@ -24,7 +24,7 @@ export default function Page() {
   const [opponentPlayerData, setOpponentPlayerData] = usePlayerData();
   const [statusTxt, setStatusTxt] = useState<string>(getTxt("Loading"));
   const [joinedMatch, setJoinedMatch] = useState<Boolean>(false);
-  const [startCountdownTimer, setStartCountdownTimer] = useState<number>(Config.roundStartCountdownDuration);
+  const [startCountdownTimer, setStartCountdownTimer] = useState<number>();
   const params = useParams()
 
   useEffect(() => {
@@ -37,6 +37,21 @@ export default function Page() {
       syncMatchData(matchRoom, pd.playerId);
     }
   }, [myPlayerData, matchRoom]);
+
+  useEffect(() => {
+    if (matchRoom.matchIsRunning && matchRoom.currentRound === 1 && startCountdownTimer === undefined) {
+      setStartCountdownTimer(Config.roundStartCountdownDuration + 1);
+    }
+  }, [matchRoom])
+
+  useEffect(() => {
+    if (matchRoom.matchIsRunning && matchRoom.currentRound === 1 && (startCountdownTimer && startCountdownTimer >= 0) {
+      const interval = setInterval(() => {
+        setStartCountdownTimer(startCountdownTimer - 1);
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [startCountdownTimer])
 
   useEffect(() => {
     if (client) {
@@ -134,19 +149,6 @@ export default function Page() {
 
     //Check if we need to start match
     CheckStartMatch(matchData);
-  }
-
-  const CheckStartMatch = (mr: MatchRoom) => {
-    if (mr.matchIsRunning && mr.currentRound === 1 && startCountdownTimer !== 0) {
-      let cdwn = setInterval(() => {
-        if (startCountdownTimer > 0) {
-          setStartCountdownTimer(startCountdownTimer - 1);
-        }
-        else {
-          clearInterval(cdwn);
-        }
-      }, 1000)
-    }
   }
 
   const readyToStartClick = () => {
