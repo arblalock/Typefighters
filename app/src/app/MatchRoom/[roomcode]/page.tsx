@@ -40,12 +40,12 @@ export default function Page() {
 
   useEffect(() => {
     if (matchRoom.matchIsRunning && matchRoom.currentRound === 1 && startCountdownTimer === undefined) {
-      setStartCountdownTimer(Config.roundStartCountdownDuration + 1);
+      setStartCountdownTimer(Config.roundStartCountdownDuration);
     }
   }, [matchRoom])
 
   useEffect(() => {
-    if (matchRoom.matchIsRunning && matchRoom.currentRound === 1 && (startCountdownTimer && startCountdownTimer >= 0) {
+    if (matchRoom.matchIsRunning && matchRoom.currentRound === 1 && (startCountdownTimer && startCountdownTimer > 0)) {
       const interval = setInterval(() => {
         setStartCountdownTimer(startCountdownTimer - 1);
       }, 1000);
@@ -146,9 +146,6 @@ export default function Page() {
       }
     }
     setMatchData(matchData);
-
-    //Check if we need to start match
-    CheckStartMatch(matchData);
   }
 
   const readyToStartClick = () => {
@@ -181,10 +178,10 @@ export default function Page() {
           <div className="basis-10/12 items-center">
             <UserDisplay playerData={myPlayerData} matchData={matchRoom} inputCB={handleUserInput}>
             </UserDisplay>
-            <GameCenterDisplay matchData={matchRoom} />
+            <GameCenterDisplay matchData={matchRoom} timer={startCountdownTimer} />
             <OpponentDisplay playerData={opponentPlayerData} matchData={matchRoom} />
           </div>
-          <div className="basis-2/12 items-center justify-center">
+          <div className="basis-2/12 min-w-[160px] items-center justify-center">
             <GameInfoPanel>
               <Scoreboard matchData={matchRoom} myData={myPlayerData} oppData={opponentPlayerData} />
             </GameInfoPanel>

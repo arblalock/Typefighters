@@ -7,8 +7,10 @@ type DivProps = {
 
 export const Divider = ({ margin = 1, background = "dark-bg-6" }: DivProps) => {
     return (
-        <CenterContainer margin={margin}>
+        <div style={{
+            margin: `${margin}rem`,
+        }} className="w-full">
             <div className={`w-full h-px ${background}`} />
-        </CenterContainer>
+        </div>
     )
 }   
